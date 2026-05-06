@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Prompt Engine</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Prompt Engine</p>
+          <h1>Aesthetic Image Prompt Studio</h1>
+        </div>
+        <div class="status-pill" id="status">Ready</div>
+      </header>
+
+      <section class="workspace">
+        <form class="control-panel" id="promptForm">
+          <div class="field span-2">
+            <label for="subject">Subject</label>
+            <textarea id="subject" rows="3">back-facing candid photo of a person wearing a Chrome Hearts shirt</textarea>
+          </div>
+
+          <div class="field">
+            <label for="aesthetic">Aesthetic</label>
+            <select id="aesthetic"></select>
+          </div>
+
+          <div class="field">
+            <label for="camera">Camera</label>
+            <select id="camera"></select>
+          </div>
+
+          <div class="field">
+            <label for="lighting">Lighting</label>
+            <select id="lighting"></select>
+          </div>
+
+          <div class="field">
+            <label for="pose">Pose</label>
+            <select id="pose"></select>
+          </div>
+
+          <div class="field span-2">
+            <label for="location">Location</label>
+            <input id="location" value="neon night walkway outside a packed club">
+          </div>
+
+          <div class="field">
+            <label for="mood">Mood</label>
+            <input id="mood" value="confident, anonymous, and cinematic">
+          </div>
+
+          <div class="field">
+            <label for="platform">Platform</label>
+            <select id="platform"></select>
+          </div>
+
+          <div class="field">
+            <label for="model">Model profile</label>
+            <select id="model"></select>
+          </div>
+
+          <div class="button-row span-2">
+            <button type="submit" class="primary">Generate Prompt</button>
+            <button type="button" id="randomize">Randomize</button>
+            <button type="button" id="clear">Clear</button>
+          </div>
+        </form>
+
+        <aside class="output-panel">
+          <div class="output-actions">
+            <button type="button" data-copy="modelPrompt">Copy Model-Specific Prompt</button>
+            <button type="button" data-copy="negativePrompt">Copy Negative Prompt</button>
+            <button type="button" data-copy="fullOutput">Copy Full Output</button>
+          </div>
+
+          <div class="output-stack" id="output">
+            <section class="output-section">
+              <h2>Universal Prompt</h2>
+              <p id="universalPrompt"></p>
+            </section>
+
+            <section class="output-section">
+              <h2>Model-Specific Prompt</h2>
+              <p id="modelPrompt"></p>
+            </section>
+
+            <section class="output-section">
+              <h2>Negative Prompt</h2>
+              <p id="negativePrompt"></p>
+            </section>
+
+            <section class="output-section">
+              <h2>Identity Lock</h2>
+              <ul id="identityLock"></ul>
+            </section>
+
+            <section class="output-section">
+              <h2>Prompt DNA</h2>
+              <ul id="promptDna"></ul>
+            </section>
+
+            <section class="output-section">
+              <h2>Variations</h2>
+              <ol id="variations"></ol>
+            </section>
+
+            <section class="output-section">
+              <h2>Captions</h2>
+              <ul id="captions"></ul>
+            </section>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

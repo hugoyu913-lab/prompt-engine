@@ -24,6 +24,10 @@ prompt-engine/
 │   └── learned_patterns.json
 ├── examples/
 │   └── example_outputs.md
+├── web/
+│   ├── index.html
+│   ├── styles.css
+│   └── app.js
 ├── src/
 │   └── generate_prompt.py
 ├── README.md
@@ -37,6 +41,16 @@ From the project root:
 ```bash
 python src/generate_prompt.py
 ```
+
+## Web Interface
+
+Prompt Engine also includes a local static website. Open this file in your browser:
+
+```text
+web/index.html
+```
+
+No backend or install step is required. The web app uses the same presets as the Python project, with defaults tuned for a back-facing candid Chrome Hearts nightlife prompt.
 
 The CLI asks for:
 
