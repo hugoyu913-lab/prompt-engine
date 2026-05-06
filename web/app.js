@@ -275,7 +275,11 @@ const elements = {
   previewMood: document.querySelector("#previewMood"),
   previewPlatform: document.querySelector("#previewPlatform"),
   generateButton: document.querySelector("#generateButton"),
-  stickyGenerateButton: document.querySelector("#stickyGenerateButton")
+  stickyGenerateButton: document.querySelector("#stickyGenerateButton"),
+  extractFromUrl: document.querySelector("#extractFromUrl"),
+  extractStatus: document.querySelector("#extractStatus"),
+  referenceImagesSection: document.querySelector("#referenceImagesSection"),
+  referenceThumbnails: document.querySelector("#referenceThumbnails")
 };
 
 let latestOutput = "";
@@ -712,6 +716,99 @@ function renderRecentRuns() {
   });
 }
 
+async function extractGarmentFromUrl() {
+  const url = elements.garmentProductUrl.value.trim();
+  if (!url) {
+    showExtractStatus("error", "Paste a product URL first.");
+    return;
+  }
+
+  elements.extractFromUrl.disabled = true;
+  elements.extractFromUrl.textContent = "Extracting…";
+  showExtractStatus("", "Fetching product data…");
+
+  try {
+    const response = await fetch("http://localhost:5050/extract-garment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      showExtractStatus("error", data.error || "Extraction failed.");
+      return;
+    }
+
+    fillGarmentFields(data);
+    showReferenceImages(data.image_urls || []);
+
+    const notes = data.extraction_notes || [];
+    const msg = notes.length
+      ? `Extracted. ${notes.join(" ")}`
+      : "Garment details extracted successfully.";
+    showExtractStatus("success", msg);
+  } catch (err) {
+    if (err instanceof TypeError && err.message.toLowerCase().includes("fetch")) {
+      showExtractStatus("error", "Cannot reach backend. Run: python server/app.py");
+    } else {
+      showExtractStatus("error", `Error: ${err.message}`);
+    }
+  } finally {
+    elements.extractFromUrl.disabled = false;
+    elements.extractFromUrl.textContent = "Extract from URL";
+  }
+}
+
+function fillGarmentFields(data) {
+  const fieldMap = {
+    garmentBrand: data.brand,
+    garmentProductName: data.product_name,
+    garmentType: data.garment_type,
+    garmentColor: data.color,
+    garmentFit: data.fit,
+    garmentMaterial: data.material,
+    garmentFrontDesign: data.front_design,
+    garmentBackDesign: data.back_design,
+    garmentLogoPlacement: data.logo_text_placement,
+    garmentMustPreserve: data.must_preserve,
+    garmentMustAvoid: data.must_avoid
+  };
+  Object.entries(fieldMap).forEach(([key, value]) => {
+    if (value && elements[key]) {
+      elements[key].value = value;
+    }
+  });
+  generatePrompt();
+}
+
+function showReferenceImages(urls) {
+  elements.referenceThumbnails.innerHTML = "";
+  if (!urls.length) {
+    elements.referenceImagesSection.hidden = true;
+    return;
+  }
+  urls.forEach((url) => {
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = "Product reference";
+    img.className = "reference-thumbnail";
+    img.title = "Click to open full image";
+    img.addEventListener("click", () => window.open(url, "_blank"));
+    img.addEventListener("error", () => img.remove());
+    elements.referenceThumbnails.appendChild(img);
+  });
+  elements.referenceImagesSection.hidden = false;
+}
+
+function showExtractStatus(type, message) {
+  const el = elements.extractStatus;
+  el.textContent = message;
+  el.className = "extract-status" + (type ? " " + type : "");
+  el.hidden = !message;
+}
+
 function init() {
   fillSelect(elements.aesthetic, aesthetics, "rarely_online_flash");
   fillSelect(elements.camera, cameras, "ricoh_gr_iii");
@@ -725,6 +822,7 @@ function init() {
     event.preventDefault();
     generatePrompt(true);
   });
+  elements.extractFromUrl.addEventListener("click", extractGarmentFromUrl);
   document.querySelector("#randomize").addEventListener("click", randomize);
   document.querySelector("#clear").addEventListener("click", clearForm);
   document.querySelector("#savePrompt").addEventListener("click", () => saveCurrentPrompt(false));

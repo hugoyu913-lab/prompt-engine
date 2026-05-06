@@ -24,6 +24,9 @@ prompt-engine/
 │   └── learned_patterns.json
 ├── examples/
 │   └── example_outputs.md
+├── server/
+│   ├── app.py
+│   └── garment_extractor.py
 ├── web/
 │   ├── index.html
 │   ├── styles.css
@@ -44,13 +47,66 @@ python src/generate_prompt.py
 
 ## Web Interface
 
-Prompt Engine also includes a local static website. Open this file in your browser:
+Prompt Engine includes a local static website. Open this file in your browser:
 
 ```text
 web/index.html
 ```
 
-No backend or install step is required. The web app uses the same presets as the Python project, with defaults tuned for a back-facing candid Chrome Hearts nightlife prompt.
+The web app uses the same presets as the Python project, with defaults tuned for a back-facing candid Chrome Hearts nightlife prompt.
+
+## URL Garment Extraction
+
+Paste any clothing product URL into the **Product URL** field and click **Extract from URL**. The backend fetches the page and auto-fills all garment fields (brand, name, type, color, fit, material, front/back design, logo placement, must preserve, must avoid). Extracted product images appear as clickable thumbnails.
+
+### Run the backend
+
+Install dependencies once:
+
+```bash
+pip install -r requirements.txt
+```
+
+Start the backend server (keep this terminal open):
+
+```bash
+python server/app.py
+```
+
+The backend runs at `http://localhost:5050`. The web UI connects to it automatically.
+
+### Open the website
+
+Open `web/index.html` in your browser. No additional server is needed for the UI itself.
+
+### Use URL extraction
+
+1. Paste a product URL into the **Product URL** field in the Garment Reference panel.
+2. Click **Extract from URL**.
+3. Wait a moment — all garment fields auto-fill from the product page.
+4. Edit any field manually after extraction.
+5. Extracted product images appear as thumbnails below the URL field.
+
+**Reference Image Reminder:** For exact logos, prints, or graphics, upload one of the extracted product images directly to your image model as a visual reference. Text prompts alone cannot guarantee exact reproduction of specific logos or graphics.
+
+### Supported extraction sources
+
+- JSON-LD product schema (`@type: Product`)
+- Open Graph tags (`og:title`, `og:description`, `og:image`)
+- Meta tags (`name`, `description`, `brand`)
+- Page title and `<h1>`
+- Product description text (color, fit, material, design details inferred)
+- Inline script JSON blobs and `<img>` tags (for product images)
+
+### Error handling
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| Cannot reach backend | Server not running | Run `python server/app.py` |
+| 403 Forbidden | Site blocks scrapers | Try a different product page or brand |
+| 404 Not Found | Bad URL | Check the URL in your browser |
+| Timeout | Slow or blocking site | Try again or use a different URL |
+| Could not auto-extract | No structured data | Fill missing fields manually |
 
 The CLI asks for:
 

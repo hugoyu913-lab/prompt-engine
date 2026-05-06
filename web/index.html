@@ -142,7 +142,16 @@
                 </div>
                 <div class="field span-2">
                   <label for="garmentProductUrl">Product URL</label>
-                  <input id="garmentProductUrl" placeholder="Optional reference URL">
+                  <div class="url-extract-row">
+                    <input id="garmentProductUrl" placeholder="Paste product URL to auto-fill garment fields">
+                    <button type="button" id="extractFromUrl" class="extract-btn">Extract from URL</button>
+                  </div>
+                  <div id="extractStatus" class="extract-status" hidden></div>
+                </div>
+                <div class="field span-2" id="referenceImagesSection" hidden>
+                  <label>Extracted Product Images</label>
+                  <div class="reference-thumbnails" id="referenceThumbnails"></div>
+                  <p class="reference-reminder"><strong>Reference Image Reminder:</strong> For exact logos, prints, or graphics — upload one of these images as a visual reference to your image model. Text prompts alone cannot guarantee exact reproduction of specific logos or graphics.</p>
                 </div>
                 <div class="field">
                   <label for="garmentType">Garment type</label>

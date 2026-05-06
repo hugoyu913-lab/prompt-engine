@@ -387,6 +387,84 @@ input[type="range"] {
   gap: 13px;
 }
 
+.url-extract-row {
+  display: flex;
+  gap: 8px;
+}
+
+.url-extract-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.extract-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+  border-color: rgba(201, 168, 103, 0.45);
+  color: var(--accent);
+}
+
+.extract-btn:hover {
+  border-color: var(--accent);
+  background: rgba(201, 168, 103, 0.1);
+}
+
+.extract-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.extract-status {
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  line-height: 1.45;
+  border: 1px solid transparent;
+}
+
+.extract-status.success {
+  background: rgba(100, 200, 100, 0.1);
+  border-color: rgba(100, 200, 100, 0.28);
+  color: #8fd88f;
+}
+
+.extract-status.error {
+  background: rgba(220, 80, 80, 0.1);
+  border-color: rgba(220, 80, 80, 0.28);
+  color: #e08080;
+}
+
+.reference-thumbnails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reference-thumbnail {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.reference-thumbnail:hover {
+  border-color: var(--accent);
+}
+
+.reference-reminder {
+  margin: 10px 0 0;
+  padding: 10px 14px;
+  background: rgba(201, 168, 103, 0.08);
+  border: 1px solid rgba(201, 168, 103, 0.22);
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--soft);
+  line-height: 1.5;
+}
+
 .toggle-row {
   display: inline-flex;
   align-items: center;
