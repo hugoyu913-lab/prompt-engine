@@ -317,6 +317,34 @@ input[type="range"] {
   accent-color: var(--accent);
 }
 
+.garment-panel {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.garment-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 13px;
+}
+
+.toggle-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.toggle-row input {
+  width: auto;
+  accent-color: var(--accent);
+}
+
 .moodboard-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -515,6 +543,7 @@ ol {
   }
 
   .control-panel,
+  .garment-grid,
   .strength-grid,
   .moodboard-grid {
     grid-template-columns: 1fr;

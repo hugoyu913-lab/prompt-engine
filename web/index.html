@@ -122,6 +122,67 @@
               <label>Imperfection <input type="range" min="0" max="10" value="8" id="imperfectionStrength"></label>
             </div>
 
+            <section class="garment-panel span-2">
+              <div class="panel-header">
+                <p class="eyebrow">Garment Reference / Clothing Accuracy</p>
+                <label class="toggle-row" for="garmentAccuracyMode">
+                  <input type="checkbox" id="garmentAccuracyMode" checked>
+                  Garment Accuracy Mode
+                </label>
+              </div>
+
+              <div class="garment-grid">
+                <div class="field">
+                  <label for="garmentBrand">Brand</label>
+                  <input id="garmentBrand" value="Chrome Hearts">
+                </div>
+                <div class="field">
+                  <label for="garmentProductName">Product name</label>
+                  <input id="garmentProductName" value="black cross back short sleeve shirt">
+                </div>
+                <div class="field span-2">
+                  <label for="garmentProductUrl">Product URL</label>
+                  <input id="garmentProductUrl" placeholder="Optional reference URL">
+                </div>
+                <div class="field">
+                  <label for="garmentType">Garment type</label>
+                  <input id="garmentType" value="oversized short sleeve shirt">
+                </div>
+                <div class="field">
+                  <label for="garmentColor">Color</label>
+                  <input id="garmentColor" value="black">
+                </div>
+                <div class="field">
+                  <label for="garmentFit">Fit</label>
+                  <input id="garmentFit" value="oversized body, relaxed sleeves">
+                </div>
+                <div class="field">
+                  <label for="garmentMaterial">Material</label>
+                  <input id="garmentMaterial" value="cotton jersey with natural fabric drape">
+                </div>
+                <div class="field span-2">
+                  <label for="garmentFrontDesign">Front design</label>
+                  <input id="garmentFrontDesign" value="minimal front, no invented chest graphic">
+                </div>
+                <div class="field span-2">
+                  <label for="garmentBackDesign">Back design</label>
+                  <input id="garmentBackDesign" value="large cross graphic centered on the shirt back">
+                </div>
+                <div class="field span-2">
+                  <label for="garmentLogoPlacement">Logo/text placement</label>
+                  <input id="garmentLogoPlacement" value="back graphic centered, no random text, no shifted logo placement">
+                </div>
+                <div class="field span-2">
+                  <label for="garmentMustPreserve">Must preserve</label>
+                  <textarea id="garmentMustPreserve" rows="2">exact shirt structure, large centered back cross graphic, black color, oversized fit, natural cotton folds</textarea>
+                </div>
+                <div class="field span-2">
+                  <label for="garmentMustAvoid">Must avoid</label>
+                  <textarea id="garmentMustAvoid" rows="2">invented graphics, random gothic symbols, duplicated back graphic, altered logo placement, fantasy streetwear design</textarea>
+                </div>
+              </div>
+            </section>
+
             <div class="button-row span-2">
               <button type="submit" class="primary" id="generateButton">Generate Prompt</button>
               <button type="button" id="randomize">Randomize</button>
@@ -145,6 +206,7 @@
         <aside class="output-panel glass-panel">
           <div class="output-actions">
             <button type="button" data-copy="cleanPrompt">Copy Clean Prompt</button>
+            <button type="button" data-copy="cleanGarmentPrompt">Copy Clean Garment Prompt</button>
             <button type="button" data-copy="modelPrompt">Copy Model-Specific Prompt</button>
             <button type="button" data-copy="cleanNegativePrompt">Copy Clean Negative Prompt</button>
             <button type="button" data-copy="fullOutput">Copy Full Output</button>
@@ -159,6 +221,11 @@
             <details class="output-section" open>
               <summary>Clean Negative Prompt</summary>
               <p id="cleanNegativePrompt"></p>
+            </details>
+
+            <details class="output-section" open>
+              <summary>Clean Garment Prompt</summary>
+              <p id="cleanGarmentPrompt"></p>
             </details>
 
             <details class="output-section" open>

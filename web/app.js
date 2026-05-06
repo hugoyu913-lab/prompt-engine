@@ -218,7 +218,7 @@ const quickPresets = {
   }
 };
 
-const negativePrompt = "AI-looking image, plastic skin, waxy face, over-smoothed texture, fake pores, missing pores, airbrushed face, rubber skin, distorted hands, extra fingers, missing fingers, fused fingers, broken anatomy, uneven eyes, warped face, uncanny smile, glassy eyes, crossed eyes, duplicate person, identity drift, bad teeth, melted clothing, impossible fabric folds, glossy plastic clothing, broken jewelry, fake luxury ad look, stiff fashion posing, over-clean AI lighting, fake logo, unreadable text, misspelled text, distorted shirt graphics, warped cross design, unreadable logo, warped background signs, impossible shadows, mismatched reflections, over-sharpened details, oversaturated colors, harsh HDR, fantasy render, cartoon, anime, 3D render, CGI, doll-like face, overly perfect symmetry, beauty-filter face, blurry subject, noisy face, low-resolution image, watermark, signature, frame, border.";
+const negativePrompt = "AI-looking image, plastic skin, waxy face, over-smoothed texture, fake pores, missing pores, airbrushed face, rubber skin, distorted hands, extra fingers, missing fingers, fused fingers, broken anatomy, uneven eyes, warped face, uncanny smile, glassy eyes, crossed eyes, duplicate person, identity drift, bad teeth, melted clothing, impossible fabric folds, glossy plastic clothing, broken jewelry, fake luxury ad look, stiff fashion posing, over-clean AI lighting, fake logo, unreadable text, misspelled text, distorted shirt graphic, distorted shirt graphics, warped cross design, invented cross design, random gothic symbols, duplicated back graphic, incorrect print placement, altered logo placement, fantasy streetwear design, warped background signs, impossible shadows, mismatched reflections, over-sharpened details, oversaturated colors, harsh HDR, fantasy render, cartoon, anime, 3D render, CGI, doll-like face, overly perfect symmetry, beauty-filter face, blurry subject, noisy face, low-resolution image, watermark, signature, frame, border.";
 const storageKey = "prompt-engine-web-runs";
 const favoritesKey = "prompt-engine-web-favorites";
 
@@ -234,6 +234,19 @@ const elements = {
   platform: document.querySelector("#platform"),
   model: document.querySelector("#model"),
   qualityMode: document.querySelector("#qualityMode"),
+  garmentAccuracyMode: document.querySelector("#garmentAccuracyMode"),
+  garmentBrand: document.querySelector("#garmentBrand"),
+  garmentProductName: document.querySelector("#garmentProductName"),
+  garmentProductUrl: document.querySelector("#garmentProductUrl"),
+  garmentType: document.querySelector("#garmentType"),
+  garmentColor: document.querySelector("#garmentColor"),
+  garmentFit: document.querySelector("#garmentFit"),
+  garmentMaterial: document.querySelector("#garmentMaterial"),
+  garmentFrontDesign: document.querySelector("#garmentFrontDesign"),
+  garmentBackDesign: document.querySelector("#garmentBackDesign"),
+  garmentLogoPlacement: document.querySelector("#garmentLogoPlacement"),
+  garmentMustPreserve: document.querySelector("#garmentMustPreserve"),
+  garmentMustAvoid: document.querySelector("#garmentMustAvoid"),
   strengths: {
     realism: document.querySelector("#realismStrength"),
     candidness: document.querySelector("#candidnessStrength"),
@@ -246,6 +259,7 @@ const elements = {
   universalPrompt: document.querySelector("#universalPrompt"),
   modelPrompt: document.querySelector("#modelPrompt"),
   cleanNegativePrompt: document.querySelector("#cleanNegativePrompt"),
+  cleanGarmentPrompt: document.querySelector("#cleanGarmentPrompt"),
   negativePrompt: document.querySelector("#negativePrompt"),
   identityLock: document.querySelector("#identityLock"),
   promptDna: document.querySelector("#promptDna"),
@@ -293,7 +307,26 @@ function readInput() {
     platformKey: elements.platform.value,
     modelKey: elements.model.value,
     qualityModeKey: elements.qualityMode.value,
+    garment: readGarmentInput(),
     strengths: Object.fromEntries(Object.entries(elements.strengths).map(([key, input]) => [key, Number(input.value)]))
+  };
+}
+
+function readGarmentInput() {
+  return {
+    enabled: elements.garmentAccuracyMode.checked,
+    brand: elements.garmentBrand.value.trim(),
+    productName: elements.garmentProductName.value.trim(),
+    productUrl: elements.garmentProductUrl.value.trim(),
+    type: elements.garmentType.value.trim(),
+    color: elements.garmentColor.value.trim(),
+    fit: elements.garmentFit.value.trim(),
+    material: elements.garmentMaterial.value.trim(),
+    frontDesign: elements.garmentFrontDesign.value.trim(),
+    backDesign: elements.garmentBackDesign.value.trim(),
+    logoPlacement: elements.garmentLogoPlacement.value.trim(),
+    mustPreserve: elements.garmentMustPreserve.value.trim(),
+    mustAvoid: elements.garmentMustAvoid.value.trim()
   };
 }
 
@@ -330,7 +363,33 @@ function buildUniversalPrompt(input) {
   const subjectIntro = input.subject.toLowerCase().includes("back-facing")
     ? `Back-facing candid late-night photo of ${cleanSubject}`
     : `Hyper-realistic photo of ${cleanSubject}`;
-  return `${subjectIntro} at ${input.location}. ${platform.format}. ${labelFor(input.aestheticKey)} mood: ${input.mood}. ${aesthetic.description} Details: ${aesthetic.details.join(", ")}. Camera: ${camera.label}; ${camera.look}. Lighting: ${lighting[input.lightingKey]}; ${aesthetic.lighting}. Composition: ${poses[input.poseKey]}, ${qualityMode.direction}. Direction: ${strengthWording(input.strengths)}. Realism: ${aesthetic.realism_notes.join(", ")}, natural pores, accurate hands, believable lens distortion, real fabric texture, subtle background mess, not over-edited, not AI-looking.`;
+  const garmentDirection = input.garment.enabled ? ` Garment accuracy overrides aesthetic styling. ${buildGarmentAccuracyText(input.garment)}` : "";
+  return `${subjectIntro} at ${input.location}. ${platform.format}. ${labelFor(input.aestheticKey)} mood: ${input.mood}. ${aesthetic.description} Details: ${aesthetic.details.join(", ")}. Camera: ${camera.label}; ${camera.look}. Lighting: ${lighting[input.lightingKey]}; ${aesthetic.lighting}. Composition: ${poses[input.poseKey]}, ${qualityMode.direction}. Direction: ${strengthWording(input.strengths)}. Realism: ${aesthetic.realism_notes.join(", ")}, natural pores, accurate hands, believable lens distortion, real fabric texture, subtle background mess, not over-edited, not AI-looking.${garmentDirection}`;
+}
+
+function buildGarmentAccuracyText(garment) {
+  const parts = [
+    garment.brand ? `Brand reference: ${garment.brand}` : "",
+    garment.productName ? `product: ${garment.productName}` : "",
+    garment.type ? `type: ${garment.type}` : "",
+    garment.color ? `color: ${garment.color}` : "",
+    garment.fit ? `fit: ${garment.fit}` : "",
+    garment.material ? `material: ${garment.material}` : "",
+    garment.frontDesign ? `front design: ${garment.frontDesign}` : "",
+    garment.backDesign ? `back design: ${garment.backDesign}` : "",
+    garment.logoPlacement ? `logo/text placement: ${garment.logoPlacement}` : "",
+    garment.productUrl ? `reference URL: ${garment.productUrl}` : ""
+  ].filter(Boolean).join("; ");
+
+  const preserve = garment.mustPreserve || "exact garment structure, accurate graphic placement, correct logo/text placement";
+  const avoid = garment.mustAvoid || "invented graphics, random text, extra symbols, altered logo placement";
+
+  return `${parts}. Preserve: ${preserve}. Avoid: ${avoid}. Strict garment lock: describe the clothing physically, reduce repeated brand naming, preserve exact garment structure, accurate graphic placement, no invented graphics, no random text, no extra symbols, no altered logo placement, no fake luxury design.`;
+}
+
+function buildCleanGarmentPrompt(input) {
+  if (!input.garment.enabled) return "Garment Accuracy Mode is off.";
+  return buildGarmentAccuracyText(input.garment).replace(/\s+/g, " ").trim();
 }
 
 function buildModelPrompt(universalPrompt, input) {
@@ -435,6 +494,9 @@ function buildFullOutput(parts) {
     "## Clean Negative Prompt",
     parts.cleanNegativePrompt,
     "",
+    "## Clean Garment Prompt",
+    parts.cleanGarmentPrompt,
+    "",
     "## Negative Prompt",
     parts.negativePrompt,
     "",
@@ -478,6 +540,7 @@ function generatePrompt(saveRun = false) {
     const universalPrompt = buildUniversalPrompt(input);
     const modelPrompt = buildModelPrompt(universalPrompt, input);
     const cleanPrompt = buildCleanPrompt(modelPrompt);
+    const cleanGarmentPrompt = buildCleanGarmentPrompt(input);
     const identityLock = buildIdentityLock(input.subject);
     const promptDna = buildPromptDna(input);
     const variations = buildVariations(input);
@@ -485,6 +548,7 @@ function generatePrompt(saveRun = false) {
     const qualityChecklist = buildQualityChecklist();
 
     elements.cleanPrompt.textContent = cleanPrompt;
+    elements.cleanGarmentPrompt.textContent = cleanGarmentPrompt;
     elements.universalPrompt.textContent = universalPrompt;
     elements.modelPrompt.textContent = modelPrompt;
     elements.cleanNegativePrompt.textContent = negativePrompt;
@@ -495,7 +559,7 @@ function generatePrompt(saveRun = false) {
     renderList(elements.captions, captions);
     renderList(elements.qualityChecklist, qualityChecklist);
 
-    latestParts = { input, universalPrompt, cleanPrompt, modelPrompt, cleanNegativePrompt: negativePrompt, negativePrompt, identityLock, promptDna, variations, captions, qualityChecklist };
+    latestParts = { input, universalPrompt, cleanPrompt, cleanGarmentPrompt, modelPrompt, cleanNegativePrompt: negativePrompt, negativePrompt, identityLock, promptDna, variations, captions, qualityChecklist };
     latestOutput = buildFullOutput(latestParts);
     setGenerating(false);
     setStatus("Generated");
@@ -558,6 +622,20 @@ function applyPreset(name) {
   elements.pose.value = preset.pose;
   elements.location.value = preset.location;
   elements.mood.value = preset.mood;
+  if (name === "chrome_hearts_fit") {
+    elements.garmentAccuracyMode.checked = true;
+    elements.garmentBrand.value = "Chrome Hearts";
+    elements.garmentProductName.value = "black cross back short sleeve shirt";
+    elements.garmentType.value = "oversized short sleeve shirt";
+    elements.garmentColor.value = "black";
+    elements.garmentFit.value = "oversized body, relaxed sleeves";
+    elements.garmentMaterial.value = "cotton jersey with natural fabric drape";
+    elements.garmentFrontDesign.value = "minimal front, no invented chest graphic";
+    elements.garmentBackDesign.value = "large cross graphic centered on the shirt back";
+    elements.garmentLogoPlacement.value = "back graphic centered, no random text, no shifted logo placement";
+    elements.garmentMustPreserve.value = "exact shirt structure, large centered back cross graphic, black color, oversized fit, natural cotton folds";
+    elements.garmentMustAvoid.value = "invented graphics, random gothic symbols, duplicated back graphic, altered logo placement, fantasy streetwear design";
+  }
   setStrengths(preset.strengths);
   generatePrompt();
 }
@@ -668,7 +746,20 @@ function init() {
     elements.pose,
     elements.platform,
     elements.model,
-    elements.qualityMode
+    elements.qualityMode,
+    elements.garmentAccuracyMode,
+    elements.garmentBrand,
+    elements.garmentProductName,
+    elements.garmentProductUrl,
+    elements.garmentType,
+    elements.garmentColor,
+    elements.garmentFit,
+    elements.garmentMaterial,
+    elements.garmentFrontDesign,
+    elements.garmentBackDesign,
+    elements.garmentLogoPlacement,
+    elements.garmentMustPreserve,
+    elements.garmentMustAvoid
   ].forEach((input) => {
     input.addEventListener("change", () => generatePrompt());
   });
@@ -677,6 +768,7 @@ function init() {
       const target = button.dataset.copy;
       const map = {
         cleanPrompt: elements.cleanPrompt.textContent,
+        cleanGarmentPrompt: elements.cleanGarmentPrompt.textContent,
         modelPrompt: elements.modelPrompt.textContent,
         cleanNegativePrompt: elements.cleanNegativePrompt.textContent,
         negativePrompt: elements.negativePrompt.textContent,
