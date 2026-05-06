@@ -18,6 +18,9 @@ prompt-engine/
 │   └── poses.json
 ├── outputs/
 │   └── .gitkeep
+├── data/
+│   ├── prompt_runs.jsonl
+│   └── image_reviews.jsonl
 ├── examples/
 │   └── example_outputs.md
 ├── src/
@@ -59,6 +62,32 @@ To randomize aesthetic, camera, lighting, and pose while still entering subject,
 ```bash
 python src/generate_prompt.py --random
 ```
+
+## Prompt Testing Lab
+
+Every generated prompt gets a unique `run_id`, writes the Markdown output to `outputs/latest_prompt.md`, and appends a tracking record to `data/prompt_runs.jsonl`.
+
+Show recent prompt runs:
+
+```bash
+python src/generate_prompt.py --history
+```
+
+Review a generated image by `run_id`:
+
+```bash
+python src/generate_prompt.py --review
+```
+
+The review flow saves realism, aesthetic, identity, postability, notes, failure points, and improvement ideas to `data/image_reviews.jsonl`.
+
+Show the highest scoring reviewed runs:
+
+```bash
+python src/generate_prompt.py --best
+```
+
+Scores use the average of realism, aesthetic, identity, and postability.
 
 ## Platform Modes
 

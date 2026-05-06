@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import random
 import sys
+import uuid
 from datetime import datetime
 from pathlib import Path
 
@@ -17,7 +18,10 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PRESETS_DIR = PROJECT_ROOT / "presets"
 PROMPTS_DIR = PROJECT_ROOT / "prompts"
 OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+DATA_DIR = PROJECT_ROOT / "data"
 LATEST_OUTPUT = OUTPUTS_DIR / "latest_prompt.md"
+PROMPT_RUNS_FILE = DATA_DIR / "prompt_runs.jsonl"
+IMAGE_REVIEWS_FILE = DATA_DIR / "image_reviews.jsonl"
 LIST_COMMANDS = {"list", "ls", "help", "?"}
 
 PLATFORM_PROFILES = {
@@ -74,6 +78,31 @@ def load_json(filename: str) -> dict:
         return json.load(file)
 
 
+def append_jsonl(path: Path, record: dict) -> None:
+    """Append one JSON object to a JSONL file."""
+    path.parent.mkdir(exist_ok=True)
+    with path.open("a", encoding="utf-8") as file:
+        file.write(json.dumps(record, ensure_ascii=True) + "\n")
+
+
+def read_jsonl(path: Path) -> list[dict]:
+    """Read JSONL records, skipping blank or broken lines."""
+    if not path.exists():
+        return []
+
+    records = []
+    with path.open("r", encoding="utf-8") as file:
+        for line in file:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                records.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    return records
+
+
 def load_negative_prompt() -> str:
     """Return the negative prompt text without Markdown headings."""
     path = PROMPTS_DIR / "negative_prompt.md"
@@ -99,6 +128,27 @@ def ask(prompt: str, default: str | None = None) -> str:
     if default:
         return default
     return ask(prompt, default)
+
+
+def ask_optional(prompt: str) -> str:
+    """Ask for optional text."""
+    return input(f"{prompt}: ").strip()
+
+
+def ask_score(prompt: str) -> int:
+    """Ask for a 1-10 review score."""
+    while True:
+        answer = ask(prompt)
+        try:
+            score = int(answer)
+        except ValueError:
+            print("Enter a whole number from 1 to 10.")
+            continue
+
+        if 1 <= score <= 10:
+            return score
+
+        print("Score must be from 1 to 10.")
 
 
 def print_preset_keys(title: str, presets: dict) -> None:
@@ -286,6 +336,7 @@ def render_list(title: str, items: list[str]) -> str:
 
 
 def render_markdown(
+    run_id: str,
     subject: str,
     aesthetic_key: str,
     location: str,
@@ -311,6 +362,8 @@ def render_markdown(
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     return f"""# Prompt Engine Output
+
+Run ID: {run_id}
 
 Generated: {created_at}
 
@@ -395,6 +448,128 @@ def maybe_print_list_and_exit(aesthetics: dict, cameras: dict) -> None:
     raise SystemExit(0)
 
 
+def show_history(limit: int = 10) -> None:
+    """Show recent prompt runs."""
+    runs = read_jsonl(PROMPT_RUNS_FILE)
+    if not runs:
+        print("No prompt runs found.")
+        return
+
+    print(f"Recent prompt runs (last {min(limit, len(runs))})")
+    for run in runs[-limit:]:
+        print(
+            f"{run['run_id']} | {run['created_at']} | {run['aesthetic']} | "
+            f"{run['camera']} | {run['pose']} | {run['platform']} | {run['subject']}"
+        )
+
+
+def review_prompt_run() -> None:
+    """Collect and save an image review for a generated prompt."""
+    runs = {run["run_id"]: run for run in read_jsonl(PROMPT_RUNS_FILE)}
+    if not runs:
+        print("No prompt runs found. Generate a prompt first.")
+        return
+
+    run_id = ask("Run ID")
+    if run_id not in runs:
+        print(f"Unknown run_id: {run_id}")
+        print("Use --history to see recent run IDs.")
+        return
+
+    realism = ask_score("Realism score /10")
+    aesthetic = ask_score("Aesthetic score /10")
+    identity = ask_score("Identity score /10")
+    postability = ask_score("Postability score /10")
+    notes = ask_optional("Notes")
+    what_failed = ask_optional("What failed")
+    what_to_improve = ask_optional("What to improve")
+    average_score = round((realism + aesthetic + identity + postability) / 4, 2)
+
+    review = {
+        "review_id": uuid.uuid4().hex[:12],
+        "run_id": run_id,
+        "created_at": datetime.now().isoformat(timespec="seconds"),
+        "realism": realism,
+        "aesthetic": aesthetic,
+        "identity": identity,
+        "postability": postability,
+        "average_score": average_score,
+        "notes": notes,
+        "what_failed": what_failed,
+        "what_to_improve": what_to_improve,
+    }
+    append_jsonl(IMAGE_REVIEWS_FILE, review)
+
+    run = runs[run_id]
+    print(f"Saved review for {run_id}. Average: {average_score}/10")
+    print(f"{run['aesthetic']} | {run['camera']} | {run['pose']} | {run['platform']}")
+
+
+def show_best(limit: int = 5) -> None:
+    """Show highest scoring reviewed prompt runs."""
+    runs = {run["run_id"]: run for run in read_jsonl(PROMPT_RUNS_FILE)}
+    reviews = read_jsonl(IMAGE_REVIEWS_FILE)
+    if not reviews:
+        print("No image reviews found. Use --review after testing generated images.")
+        return
+
+    best_by_run = {}
+    for review in reviews:
+        run_id = review["run_id"]
+        if run_id not in runs:
+            continue
+        if run_id not in best_by_run or review["average_score"] > best_by_run[run_id]["average_score"]:
+            best_by_run[run_id] = review
+
+    ranked = sorted(best_by_run.values(), key=lambda item: item["average_score"], reverse=True)
+    if not ranked:
+        print("No reviewed prompt runs matched saved history.")
+        return
+
+    print(f"Best prompt runs (top {min(limit, len(ranked))})")
+    for review in ranked[:limit]:
+        run = runs[review["run_id"]]
+        print(
+            f"{review['average_score']}/10 | {review['run_id']} | {run['aesthetic']} | "
+            f"{run['camera']} | {run['lighting']} | {run['pose']} | {run['platform']}"
+        )
+        if review.get("what_to_improve"):
+            print(f"  improve: {review['what_to_improve']}")
+
+
+def build_prompt_run_record(
+    run_id: str,
+    subject: str,
+    aesthetic_key: str,
+    location: str,
+    mood: str,
+    camera_key: str,
+    platform_key: str,
+    model_key: str,
+    lighting_key: str,
+    pose_key: str,
+    universal_prompt: str,
+    model_specific_prompt: str,
+) -> dict:
+    """Build the saved generation record."""
+    return {
+        "run_id": run_id,
+        "created_at": datetime.now().isoformat(timespec="seconds"),
+        "subject": subject,
+        "aesthetic": aesthetic_key,
+        "location": location,
+        "mood": mood,
+        "camera": camera_key,
+        "platform": platform_key,
+        "model_profile": model_key,
+        "lighting": lighting_key,
+        "pose": pose_key,
+        "universal_prompt": universal_prompt,
+        "model_specific_prompt": model_specific_prompt,
+        "latest_output": str(LATEST_OUTPUT),
+    }
+
+
 def main() -> None:
     """Run the interactive CLI."""
     aesthetics = load_json("aesthetics.json")
@@ -405,6 +580,15 @@ def main() -> None:
     random_mode = has_command("--random", "random")
 
     maybe_print_list_and_exit(aesthetics, cameras)
+    if has_command("--history", "history"):
+        show_history()
+        return
+    if has_command("--review", "review"):
+        review_prompt_run()
+        return
+    if has_command("--best", "best"):
+        show_best()
+        return
 
     print("Prompt Engine")
     print("Generate hyper-realistic social media image prompts.\n")
@@ -463,8 +647,10 @@ def main() -> None:
     )
     captions = build_captions(subject, mood, aesthetic_key, platform_key)
     scorecard = build_scorecard()
+    run_id = uuid.uuid4().hex[:12]
 
     markdown = render_markdown(
+        run_id,
         subject,
         aesthetic_key,
         location,
@@ -485,9 +671,27 @@ def main() -> None:
 
     OUTPUTS_DIR.mkdir(exist_ok=True)
     LATEST_OUTPUT.write_text(markdown, encoding="utf-8")
+    append_jsonl(
+        PROMPT_RUNS_FILE,
+        build_prompt_run_record(
+            run_id,
+            subject,
+            aesthetic_key,
+            location,
+            mood,
+            camera_key,
+            platform_key,
+            model_key,
+            lighting_key,
+            pose_key,
+            universal_prompt,
+            model_specific_prompt,
+        ),
+    )
 
     print("\n" + markdown)
     print(f"Saved to {LATEST_OUTPUT}")
+    print(f"Tracked run in {PROMPT_RUNS_FILE}")
 
 
 if __name__ == "__main__":

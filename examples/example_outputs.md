@@ -1,5 +1,7 @@
 # Example Output
 
+Run ID: `example-run-001`
+
 ## Input
 
 - Subject: a young creative director wearing a black wool coat

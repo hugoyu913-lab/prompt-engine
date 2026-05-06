@@ -1,26 +1,28 @@
 # Prompt Engine Output
 
-Generated: 2026-05-05 19:16:13
+Run ID: 12fda8a03713
+
+Generated: 2026-05-05 19:20:24
 
 ## Input
 
-- Subject: a musician in a vintage leather jacket
-- Aesthetic: `cinematic_lonely`
-- Location: downtown alley after rain
-- Mood: moody and iconic
-- Camera: `sony_a7siii_35mm`
-- Platform: `album_cover` (album cover)
-- Model profile: `midjourney` (Midjourney)
-- Lighting: `neon_night`
+- Subject: a creative athlete in black training gear
+- Aesthetic: `miami_flash`
+- Location: warehouse gym with concrete walls
+- Mood: disciplined and sharp
+- Camera: `ricoh_gr_iii`
+- Platform: `instagram_vertical_post` (Instagram vertical post)
+- Model profile: `chatgpt_image` (ChatGPT image generation)
+- Lighting: `direct_flash`
 - Pose: `seated_composed`
 
 ## Universal Prompt
 
-Hyper-realistic photograph of a musician in a vintage leather jacket in downtown alley after rain. Platform: album cover; compose as square 1:1 crop, iconic central image, negative space for title placement. Aesthetic: cinematic lonely. Mood: moody and iconic. Moody solitary photography with quiet negative space, practical light sources, filmic color, and restrained emotion. Scene details: empty street, distant background, reflective mood, subtle grain, wide negative space. Lighting: neon practical lights, colored rim light, dark ambient contrast; also preserve single practical light with soft falloff, muted shadows, and natural darkness. Camera: Sony A7S III with 35mm lens; cinematic low-light realism, clean shadows, documentary perspective, strong night detail without looking rendered. Pose and expression: seated composed posture, calm hands, confident eye line, lived-in body language, no stiff model posing. Realism requirements: low-light noise, soft background detail, natural posture fatigue, natural pores, tiny skin imperfections, realistic facial asymmetry, grounded wardrobe texture, accurate hands, believable lens distortion, subtle background messiness, authentic social-media framing, not over-edited, not AI-looking.
+Hyper-realistic photograph of a creative athlete in black training gear in warehouse gym with concrete walls. Platform: Instagram vertical post; compose as 4:5 vertical crop, strong first-glance composition, feed-ready polish. Aesthetic: miami flash. Mood: disciplined and sharp. Glossy coastal nightlife photography with direct flash, humid skin, colorful interiors, and vacation-party realism. Scene details: palm shadows, chrome bar detail, humid skin glow, white outfit, bright wall color. Lighting: direct on-camera flash, crisp shadows, glossy highlights, nightlife realism; also preserve direct flash over warm bar lights, reflective surfaces, and saturated but believable color. Camera: Ricoh GR III; wide candid street-photo realism, compact-camera immediacy, textured detail, slightly raw everyday perspective. Pose and expression: seated composed posture, calm hands, confident eye line, lived-in body language, no stiff model posing. Realism requirements: flash reflection on skin, slight color cast, realistic background clutter, natural pores, tiny skin imperfections, realistic facial asymmetry, grounded wardrobe texture, accurate hands, believable lens distortion, subtle background messiness, authentic social-media framing, not over-edited, not AI-looking.
 
 ## Model-Specific Prompt
 
-Use compact visual phrases, strong photographic tags, and clear aspect-ratio guidance. Hyper-realistic photograph of a musician in a vintage leather jacket in downtown alley after rain. Platform: album cover; compose as square 1:1 crop, iconic central image, negative space for title placement. Aesthetic: cinematic lonely. Mood: moody and iconic. Moody solitary photography with quiet negative space, practical light sources, filmic color, and restrained emotion. Scene details: empty street, distant background, reflective mood, subtle grain, wide negative space. Lighting: neon practical lights, colored rim light, dark ambient contrast; also preserve single practical light with soft falloff, muted shadows, and natural darkness. Camera: Sony A7S III with 35mm lens; cinematic low-light realism, clean shadows, documentary perspective, strong night detail without looking rendered. Pose and expression: seated composed posture, calm hands, confident eye line, lived-in body language, no stiff model posing. Realism requirements: low-light noise, soft background detail, natural posture fatigue, natural pores, tiny skin imperfections, realistic facial asymmetry, grounded wardrobe texture, accurate hands, believable lens distortion, subtle background messiness, authentic social-media framing, not over-edited, not AI-looking. Prioritize believable photography, identity consistency, and square 1:1 crop, iconic central image, negative space for title placement. --style raw --v 6
+Use natural-language direction with explicit realism, identity, camera, and composition constraints. Hyper-realistic photograph of a creative athlete in black training gear in warehouse gym with concrete walls. Platform: Instagram vertical post; compose as 4:5 vertical crop, strong first-glance composition, feed-ready polish. Aesthetic: miami flash. Mood: disciplined and sharp. Glossy coastal nightlife photography with direct flash, humid skin, colorful interiors, and vacation-party realism. Scene details: palm shadows, chrome bar detail, humid skin glow, white outfit, bright wall color. Lighting: direct on-camera flash, crisp shadows, glossy highlights, nightlife realism; also preserve direct flash over warm bar lights, reflective surfaces, and saturated but believable color. Camera: Ricoh GR III; wide candid street-photo realism, compact-camera immediacy, textured detail, slightly raw everyday perspective. Pose and expression: seated composed posture, calm hands, confident eye line, lived-in body language, no stiff model posing. Realism requirements: flash reflection on skin, slight color cast, realistic background clutter, natural pores, tiny skin imperfections, realistic facial asymmetry, grounded wardrobe texture, accurate hands, believable lens distortion, subtle background messiness, authentic social-media framing, not over-edited, not AI-looking. Prioritize believable photography, identity consistency, and 4:5 vertical crop, strong first-glance composition, feed-ready polish.
 
 ## Negative Prompt
 
@@ -30,7 +32,7 @@ AI-looking image, plastic skin, waxy face, over-smoothed texture, fake pores, mi
 
 ### Immutable face/body traits
 
-- Keep the same core subject: a musician in a vintage leather jacket.
+- Keep the same core subject: a creative athlete in black training gear.
 - Preserve face shape, apparent age range, body type, skin tone, hair length, and hair color.
 - Preserve key wardrobe anchors and recognizable styling details from the subject description.
 
@@ -48,16 +50,16 @@ AI-looking image, plastic skin, waxy face, over-smoothed texture, fake pores, mi
 
 ## 3 Variations
 
-1. Candid variation: a musician in a vintage leather jacket in downtown alley after rain, moody and iconic mood, seated composed posture, calm hands, confident eye line, neon practical lights, colored rim light, dark ambient contrast, imperfect crop, slight environmental motion, real skin texture, believable snapshot timing, square 1:1 crop, iconic central image, negative space for title placement.
-2. Editorial variation: a musician in a vintage leather jacket in downtown alley after rain, single practical light with soft falloff, muted shadows, and natural darkness, seated composed posture, calm hands, confident eye line, stronger wardrobe shape, intentional negative space, premium but realistic color grade, visible fabric texture, cinematic contrast, square 1:1 crop, iconic central image, negative space for title placement.
-3. Close portrait variation: a musician in a vintage leather jacket, tighter frame, neon practical lights, colored rim light, dark ambient contrast, honest facial detail, natural pores, subtle under-eye texture, realistic catchlights, background from downtown alley after rain still readable, identity locked, non-AI-looking.
+1. Candid variation: a creative athlete in black training gear in warehouse gym with concrete walls, disciplined and sharp mood, seated composed posture, calm hands, confident eye line, direct on-camera flash, crisp shadows, glossy highlights, nightlife realism, imperfect crop, slight environmental motion, real skin texture, believable snapshot timing, 4:5 vertical crop, strong first-glance composition, feed-ready polish.
+2. Editorial variation: a creative athlete in black training gear in warehouse gym with concrete walls, direct flash over warm bar lights, reflective surfaces, and saturated but believable color, seated composed posture, calm hands, confident eye line, stronger wardrobe shape, intentional negative space, premium but realistic color grade, visible fabric texture, cinematic contrast, 4:5 vertical crop, strong first-glance composition, feed-ready polish.
+3. Close portrait variation: a creative athlete in black training gear, tighter frame, direct on-camera flash, crisp shadows, glossy highlights, nightlife realism, honest facial detail, natural pores, subtle under-eye texture, realistic catchlights, background from warehouse gym with concrete walls still readable, identity locked, non-AI-looking.
 
 ## Captions
 
-- Moody and iconic, but keep it effortless.
-- Cinematic Lonely frame with real-life texture.
-- A musician in a vintage leather jacket energy, caught between moments.
-- Saved this one for the cover.
+- Disciplined and sharp, but keep it effortless.
+- Miami Flash frame with real-life texture.
+- A creative athlete in black training gear energy, caught between moments.
+- Saved this one for the grid.
 - Soft flaws, sharp timing.
 - Looks unplanned. Was not.
 
