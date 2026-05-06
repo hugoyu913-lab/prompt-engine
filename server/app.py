@@ -32,13 +32,22 @@ class GarmentHandler(BaseHTTPRequestHandler):
 
         try:
             result = extract_garment(url)
+            if not result:
+                self._json_response(422, {'error': 'No product data found on this page.'})
+                return
             self._json_response(200, result)
         except ValueError as e:
             self._json_response(400, {'error': str(e)})
-        except (PermissionError, FileNotFoundError, TimeoutError, ConnectionError) as e:
-            self._json_response(502, {'error': str(e)})
         except Exception as e:
-            self._json_response(500, {'error': f'Extraction failed: {e}'})
+            msg = str(e)
+            if '403' in msg or 'blocked' in msg.lower():
+                msg = 'This site blocked the request. Try a different product page or brand.'
+            elif 'timeout' in msg.lower():
+                msg = 'Request timed out. The site may be slow.'
+            elif 'connect' in msg.lower():
+                msg = 'Could not reach the URL. Check it\'s a valid product page.'
+            code = 400 if isinstance(e, ValueError) else 502
+            self._json_response(code, {'error': msg})
 
     def _send_cors_headers(self, code):
         self.send_response(code)

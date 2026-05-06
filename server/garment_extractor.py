@@ -1,17 +1,26 @@
 import re
 import json
+import time
 from urllib.parse import urlparse, urljoin
 import requests
 from bs4 import BeautifulSoup
 
-HEADERS = {
+BROWSER_HEADERS = {
     'User-Agent': (
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
         'AppleWebKit/537.36 (KHTML, like Gecko) '
-        'Chrome/120.0.0.0 Safari/537.36'
+        'Chrome/124.0.0.0 Safari/537.36'
     ),
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
     'Accept-Language': 'en-US,en;q=0.9',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Connection': 'keep-alive',
+    'Upgrade-Insecure-Requests': '1',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'none',
+    'Sec-Fetch-User': '?1',
+    'Cache-Control': 'max-age=0',
 }
 
 GARMENT_TYPES = [
@@ -68,6 +77,8 @@ MATERIAL_KEYWORDS = [
 ]
 
 
+# ── HTTP fetch ───────────────────────────────────────────────────────────────
+
 def validate_url(url: str) -> bool:
     try:
         parsed = urlparse(url)
@@ -76,32 +87,232 @@ def validate_url(url: str) -> bool:
         return False
 
 
+def fetch_page(url: str, retries: int = 2):
+    for attempt in range(retries):
+        try:
+            response = requests.get(
+                url,
+                headers=BROWSER_HEADERS,
+                timeout=15,
+                allow_redirects=True,
+            )
+            if response.status_code == 200:
+                return response
+            if response.status_code == 404:
+                raise FileNotFoundError('Product page not found (404).')
+            if response.status_code in (403, 429, 503):
+                if attempt < retries - 1:
+                    time.sleep(2 ** attempt)
+                    continue
+                raise PermissionError(
+                    f'Site blocked scraping (HTTP {response.status_code}). '
+                    'Try a different product page or brand.'
+                )
+            response.raise_for_status()
+        except requests.exceptions.Timeout:
+            if attempt < retries - 1:
+                continue
+            raise TimeoutError('Request timed out. The site may be slow or blocking requests.')
+        except requests.exceptions.TooManyRedirects:
+            raise ConnectionError('Too many redirects — page may require login.')
+        except requests.exceptions.ConnectionError:
+            raise ConnectionError('Could not connect to the URL. Check that it\'s a valid product page.')
+        except (PermissionError, FileNotFoundError, TimeoutError, ConnectionError):
+            raise
+        except requests.exceptions.RequestException as e:
+            raise ConnectionError(f'Failed to fetch page: {e}')
+    raise ConnectionError('Failed to fetch page after retries.')
+
+
+# ── SSENSE extractor ─────────────────────────────────────────────────────────
+
+def extract_ssense(soup, url: str) -> dict | None:
+    next_data_tag = soup.find('script', {'id': '__NEXT_DATA__'})
+    if not next_data_tag or not next_data_tag.string:
+        return None
+
+    try:
+        next_data = json.loads(next_data_tag.string)
+    except Exception:
+        return None
+
+    page_props = next_data.get('props', {}).get('pageProps', {})
+    product = (
+        page_props.get('product')
+        or page_props.get('productProps', {}).get('product')
+        or page_props.get('initialData', {}).get('product')
+        or _find_product_in_dict(next_data)
+    )
+
+    if not product:
+        return None
+
+    result = {
+        'brand': '',
+        'product_name': '',
+        'garment_type': '',
+        'color': '',
+        'fit': '',
+        'material': '',
+        'front_design': '',
+        'back_design': '',
+        'logo_text_placement': '',
+        'image_urls': [],
+        'description': '',
+        'must_preserve': '',
+        'must_avoid': '',
+        'extraction_notes': ['Extracted via SSENSE __NEXT_DATA__.'],
+    }
+
+    # Brand
+    brand_data = product.get('brand') or product.get('designerName') or {}
+    if isinstance(brand_data, dict):
+        result['brand'] = brand_data.get('name') or brand_data.get('brandName') or ''
+    else:
+        result['brand'] = str(brand_data)
+
+    # Product name — strip brand prefix if present
+    raw_name = product.get('name') or product.get('shortDescription') or ''
+    brand_str = result['brand']
+    if brand_str and raw_name.lower().startswith(brand_str.lower()):
+        raw_name = raw_name[len(brand_str):].strip(' -–')
+    result['product_name'] = raw_name
+
+    # Description — strip HTML if present
+    description = (
+        product.get('description')
+        or product.get('longDescription')
+        or product.get('shortDescription')
+        or ''
+    )
+    if '<' in description:
+        desc_soup = BeautifulSoup(description, 'html.parser')
+        description = desc_soup.get_text(separator=' ', strip=True)
+    result['description'] = description
+
+    # Color
+    color = (
+        product.get('color')
+        or product.get('colourName')
+        or product.get('selectedColor')
+        or ''
+    )
+    if isinstance(color, dict):
+        color = color.get('name') or color.get('label') or ''
+    result['color'] = str(color)
+
+    # Images
+    images = product.get('images') or product.get('media') or []
+    image_urls = []
+    for img in images:
+        if isinstance(img, dict):
+            src = img.get('src') or img.get('url') or img.get('imageUrl') or ''
+            if src:
+                if src.startswith('//'):
+                    src = 'https:' + src
+                image_urls.append(src)
+        elif isinstance(img, str) and img.startswith('http'):
+            image_urls.append(img)
+    result['image_urls'] = image_urls[:8]
+
+    # Garment type from category
+    category = (
+        product.get('category')
+        or product.get('categoryName')
+        or product.get('productType')
+        or ''
+    )
+    if isinstance(category, dict):
+        category = category.get('name') or category.get('label') or ''
+    result['garment_type'] = str(category)
+
+    # Material
+    material = (
+        product.get('composition')
+        or product.get('material')
+        or product.get('fabric')
+        or ''
+    )
+    if isinstance(material, list):
+        material = ', '.join(material)
+    result['material'] = str(material)
+
+    # Fit
+    result['fit'] = str(product.get('fit') or product.get('silhouette') or '')
+
+    # Fill missing fields by inferring from description
+    full_text = ' ' + (result['product_name'] + ' ' + description).lower() + ' '
+    if not result['garment_type']:
+        result['garment_type'] = _infer_garment_type(full_text)
+    if not result['color']:
+        result['color'] = _infer_color(full_text)
+    if not result['fit']:
+        result['fit'] = _infer_fit(full_text)
+    if not result['material']:
+        result['material'] = _infer_material(full_text)
+
+    desc_lower = description.lower()
+    if desc_lower:
+        if not result['front_design']:
+            result['front_design'] = _infer_front_design(desc_lower)
+        if not result['back_design']:
+            result['back_design'] = _infer_back_design(desc_lower)
+        if not result['logo_text_placement']:
+            result['logo_text_placement'] = _infer_logo_placement(desc_lower)
+
+    result['must_preserve'] = _build_must_preserve(result)
+    result['must_avoid'] = _build_must_avoid(result)
+
+    if not result['image_urls']:
+        result['extraction_notes'].append('No product images found in __NEXT_DATA__.')
+
+    missing = [f for f in ('brand', 'product_name', 'garment_type', 'color') if not result[f]]
+    if missing:
+        result['extraction_notes'].append(
+            f'Could not auto-extract: {", ".join(missing)}. Fill in manually.'
+        )
+
+    return result
+
+
+def _find_product_in_dict(data, depth: int = 0) -> dict | None:
+    if depth > 6:
+        return None
+    if isinstance(data, dict):
+        if data.get('name') and (
+            data.get('brand') or data.get('description') or data.get('designerName')
+        ):
+            return data
+        for value in data.values():
+            found = _find_product_in_dict(value, depth + 1)
+            if found:
+                return found
+    elif isinstance(data, list):
+        for item in data:
+            found = _find_product_in_dict(item, depth + 1)
+            if found:
+                return found
+    return None
+
+
+# ── Main entry point ─────────────────────────────────────────────────────────
+
 def extract_garment(url: str) -> dict:
     if not validate_url(url):
         raise ValueError('Invalid URL — must start with http:// or https://')
 
-    try:
-        response = requests.get(url, headers=HEADERS, timeout=15, allow_redirects=True)
-        if response.status_code == 403:
-            raise PermissionError(
-                'Website blocked access (403 Forbidden). '
-                'Try copying the product URL from the browser address bar.'
-            )
-        if response.status_code == 404:
-            raise FileNotFoundError('Product page not found (404).')
-        response.raise_for_status()
-    except requests.exceptions.Timeout:
-        raise TimeoutError('Request timed out. The website may be slow or blocking scrapers.')
-    except requests.exceptions.TooManyRedirects:
-        raise ConnectionError('Too many redirects — the page may require login.')
-    except requests.exceptions.ConnectionError:
-        raise ConnectionError('Could not connect to the website. Check the URL.')
-    except (PermissionError, FileNotFoundError, TimeoutError, ConnectionError):
-        raise
-    except requests.exceptions.RequestException as e:
-        raise ConnectionError(f'Failed to fetch page: {e}')
-
+    domain = urlparse(url).netloc.lower()
+    response = fetch_page(url)
     soup = BeautifulSoup(response.text, 'html.parser')
+
+    # Domain-specific extractors
+    if 'ssense.com' in domain:
+        result = extract_ssense(soup, url)
+        if result:
+            return result
+        # Fall through to generic if __NEXT_DATA__ had no product
+
+    # ── Generic extraction pipeline ──────────────────────────────────────────
 
     result = {
         'brand': '',
@@ -354,7 +565,7 @@ def _infer_back_design(text: str) -> str:
         snippet = m.group(0).strip()
         design_words = (
             'graphic', 'logo', 'print', 'text', 'embroid', 'patch',
-            'cross', 'design', 'detail', 'graphic',
+            'cross', 'design', 'detail',
         )
         if any(k in snippet for k in design_words):
             return snippet[:120]
@@ -374,25 +585,25 @@ def _infer_logo_placement(text: str) -> str:
 
 def _build_must_preserve(result: dict) -> str:
     parts = []
-    if result['garment_type']:
+    if result.get('garment_type'):
         parts.append(f'exact {result["garment_type"]} structure')
-    if result['color']:
+    if result.get('color'):
         parts.append(f'{result["color"]} color')
-    if result['fit']:
+    if result.get('fit'):
         parts.append(f'{result["fit"]} fit')
-    if result['material']:
+    if result.get('material'):
         parts.append(f'natural {result["material"]} texture and drape')
-    if result['back_design']:
+    if result.get('back_design'):
         parts.append('back design as photographed')
-    if result['front_design']:
+    if result.get('front_design'):
         parts.append('front design as photographed')
     return ', '.join(parts) or 'garment structure, color, and all design details'
 
 
 def _build_must_avoid(result: dict) -> str:
     parts = ['invented graphics', 'wrong color', 'wrong garment silhouette']
-    if result['logo_text_placement']:
+    if result.get('logo_text_placement'):
         parts.append('altered logo or text placement')
-    if result['brand']:
+    if result.get('brand'):
         parts.append('incorrect branding or invented labels')
     return ', '.join(parts)
