@@ -813,6 +813,14 @@ async function runExtraction() {
     }
 
     toggleGarmentAccordion(true);
+
+    const garmentPhrase = [data.fit, data.color, data.brand, data.garment_type]
+      .filter(Boolean).join(" ");
+    const backClause = data.back_design ? `, ${data.back_design}` : "";
+    if (garmentPhrase) {
+      elements.subject.value = `back-facing candid photo of a person in a fitted hat, ${garmentPhrase}${backClause}, walking through neon at night`;
+    }
+
     generatePrompt();
 
     const notes = data.extraction_notes || [];
