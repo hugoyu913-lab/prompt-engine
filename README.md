@@ -62,7 +62,7 @@ The CLI asks for:
 - platform
 - model profile
 
-Press Enter to use the suggested default when one is shown. The final result includes a universal prompt, model-specific prompt, negative prompt, identity lock, three variations, captions, and an image review scorecard.
+Press Enter to use the suggested default when one is shown. The final result includes clean copy-paste prompts, universal prompt, model-specific prompt, negative prompt, identity lock, three variations, captions, and an image review scorecard.
 
 To list available aesthetics and cameras without generating a prompt:
 
@@ -142,9 +142,18 @@ Every normal, evolved, and mutated prompt keeps a `run_id`, saves `outputs/lates
 - `chatgpt_image`
 - `stable_diffusion_flux`
 
+## Quality Modes
+
+- `pfp_mode`
+- `candid_realism`
+- `outfit_focus`
+- `atmosphere_focus`
+- `editorial_realism`
+
 ## Available Aesthetics
 
 - `nightlife_flash`
+- `rarely_online_flash`
 - `quiet_luxury`
 - `tokyo_streetwear`
 - `gym_discipline`

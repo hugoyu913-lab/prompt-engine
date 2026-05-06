@@ -71,6 +71,29 @@ MODEL_PROFILES = {
     },
 }
 
+QUALITY_MODES = {
+    "pfp_mode": {
+        "label": "PFP mode",
+        "direction": "tight crop, iconic silhouette, simple background, strong face or back silhouette read",
+    },
+    "candid_realism": {
+        "label": "Candid realism",
+        "direction": "less polished, accidental timing, snapshot realism, off-center framing",
+    },
+    "outfit_focus": {
+        "label": "Outfit focus",
+        "direction": "clear clothing detail, readable fabric texture, precise shirt graphics, full fit visible",
+    },
+    "atmosphere_focus": {
+        "label": "Atmosphere focus",
+        "direction": "stronger environment, practical lighting, visible background texture, night air and shadows",
+    },
+    "editorial_realism": {
+        "label": "Editorial realism",
+        "direction": "controlled composition, believable styling, restrained polish, no luxury-ad gloss",
+    },
+}
+
 
 def load_json(filename: str) -> dict:
     """Load a JSON preset file from the presets directory."""
@@ -204,6 +227,21 @@ def choose_random_key(presets: dict) -> str:
     return random.choice(list(presets.keys()))
 
 
+def clean_subject_phrase(subject: str) -> str:
+    """Remove prompt-wrapper words from subject text."""
+    lowered = subject.lower()
+    prefixes = [
+        "back-facing candid photo of ",
+        "candid photo of ",
+        "photo of ",
+        "hyper-realistic photo of ",
+    ]
+    for prefix in prefixes:
+        if lowered.startswith(prefix):
+            return subject[len(prefix):].strip()
+    return subject.strip()
+
+
 def build_universal_prompt(
     subject: str,
     aesthetic_key: str,
@@ -211,6 +249,7 @@ def build_universal_prompt(
     mood: str,
     camera_key: str,
     platform_key: str,
+    quality_mode_key: str,
     lighting_key: str,
     pose_key: str,
     aesthetics: dict,
@@ -222,21 +261,25 @@ def build_universal_prompt(
     aesthetic = aesthetics[aesthetic_key]
     camera = cameras[camera_key]
     platform = PLATFORM_PROFILES[platform_key]
+    clean_subject = clean_subject_phrase(subject)
+    subject_intro = (
+        f"Back-facing candid late-night photo of {clean_subject}"
+        if "back-facing" in subject.lower()
+        else f"Hyper-realistic photo of {clean_subject}"
+    )
     details = ", ".join(aesthetic["details"])
     realism_notes = ", ".join(aesthetic["realism_notes"])
+    quality_direction = QUALITY_MODES[quality_mode_key]["direction"]
 
     return (
-        f"Hyper-realistic photograph of {subject} in {location}. "
-        f"Platform: {platform['label']}; compose as {platform['format']}. "
-        f"Aesthetic: {aesthetic_key.replace('_', ' ')}. Mood: {mood}. "
-        f"{aesthetic['description']} "
-        f"Scene details: {details}. "
-        f"Lighting: {lighting[lighting_key]}; also preserve {aesthetic['lighting']}. "
+        f"{subject_intro} at {location}. "
+        f"{platform['format']}. {aesthetic_key.replace('_', ' ')} mood: {mood}. "
+        f"{aesthetic['description']} Details: {details}. "
         f"Camera: {camera['label']}; {camera['look']}. "
-        f"Pose and expression: {poses[pose_key]}, lived-in body language, no stiff model posing. "
-        f"Realism requirements: {realism_notes}, natural pores, tiny skin imperfections, "
-        f"realistic facial asymmetry, grounded wardrobe texture, accurate hands, believable lens distortion, "
-        f"subtle background messiness, authentic social-media framing, not over-edited, not AI-looking."
+        f"Lighting: {lighting[lighting_key]}; {aesthetic['lighting']}. "
+        f"Composition: {poses[pose_key]}, {quality_direction}. "
+        f"Realism: {realism_notes}, natural pores, accurate hands, believable lens distortion, "
+        f"real fabric texture, subtle background mess, not over-edited, not AI-looking."
     )
 
 
@@ -255,6 +298,11 @@ def build_model_specific_prompt(universal_prompt: str, model_key: str, platform_
     return prompt
 
 
+def build_clean_prompt(model_specific_prompt: str) -> str:
+    """Return the best copy-paste prompt only."""
+    return " ".join(model_specific_prompt.split())
+
+
 def build_identity_lock(subject: str) -> dict:
     """Create an identity consistency section."""
     return {
@@ -262,9 +310,11 @@ def build_identity_lock(subject: str) -> dict:
             f"Keep the same core subject: {subject}.",
             "Preserve face shape, apparent age range, body type, skin tone, hair length, and hair color.",
             "Preserve key wardrobe anchors and recognizable styling details from the subject description.",
+            "For Chrome Hearts back-facing prompts: keep the large cross graphic centered on the shirt back, fitted hat, oversized black shirt, loose grey pants, candid walking posture, and neon night setting.",
         ],
         "must_not_change": [
             "Do not change ethnicity, age range, body build, hairstyle, facial structure, or signature outfit elements.",
+            "Do not warp or replace shirt-back graphics, cross designs, fitted hat, oversized shirt silhouette, or loose pants.",
             "Do not add extra people unless the subject explicitly asks for them.",
             "Do not glamorize so much that the person becomes a different identity.",
         ],
@@ -280,6 +330,7 @@ def build_prompt_dna(
     aesthetic_key: str,
     camera_key: str,
     platform_key: str,
+    quality_mode_key: str,
     lighting_key: str,
     mood: str,
     aesthetics: dict,
@@ -296,6 +347,7 @@ def build_prompt_dna(
         "aesthetic_intensity": f"Medium-strong {aesthetic_key.replace('_', ' ')} with grounded detail.",
         "lighting_behavior": lighting[lighting_key],
         "emotional_tone": mood,
+        "quality_mode": f"{QUALITY_MODES[quality_mode_key]['label']}: {QUALITY_MODES[quality_mode_key]['direction']}",
     }
 
 
@@ -313,6 +365,7 @@ def build_variations(
     location: str,
     mood: str,
     platform_key: str,
+    quality_mode_key: str,
     lighting_key: str,
     pose_key: str,
     aesthetics: dict,
@@ -324,23 +377,35 @@ def build_variations(
     platform = PLATFORM_PROFILES[platform_key]
     selected_lighting = lighting[lighting_key]
     selected_pose = poses[pose_key]
+    clean_subject = clean_subject_phrase(subject)
+    quality_direction = QUALITY_MODES[quality_mode_key]["direction"]
 
     return [
         (
-            f"Candid variation: {subject} in {location}, {mood} mood, {selected_pose}, "
-            f"{selected_lighting}, imperfect crop, slight environmental motion, "
-            f"real skin texture, believable snapshot timing, {platform['format']}."
+            f"Candid variation: {clean_subject} at {location}, {selected_pose}, {selected_lighting}, "
+            f"off-center framing, subtle motion blur, {platform['format']}."
         ),
         (
-            f"Editorial variation: {subject} in {location}, {aesthetic['lighting']}, "
-            f"{selected_pose}, stronger wardrobe shape, intentional negative space, "
-            f"premium but realistic color grade, visible fabric texture, cinematic contrast, {platform['format']}."
+            f"Outfit variation: {clean_subject}, readable clothing shape and fabric texture, "
+            f"shirt graphics intact, {aesthetic['lighting']}, {platform['format']}."
         ),
         (
-            f"Close portrait variation: {subject}, tighter frame, {selected_lighting}, "
-            f"honest facial detail, natural pores, subtle under-eye texture, realistic catchlights, "
-            f"background from {location} still readable, identity locked, non-AI-looking."
+            f"Mode variation: {quality_direction}, same identity, {location} still readable, non-AI-looking."
         ),
+    ]
+
+
+def build_quality_checklist() -> list[str]:
+    """Checklist for prompt clarity and copy quality."""
+    return [
+        "no contradictions",
+        "no repeated phrases",
+        "clear subject",
+        "clear camera",
+        "clear lighting",
+        "clear composition",
+        "clear realism constraints",
+        "clean negative prompt",
     ]
 
 
@@ -348,7 +413,9 @@ def build_captions(subject: str, mood: str, aesthetic_key: str, platform_key: st
     """Create platform-aware social caption ideas."""
     aesthetic_name = aesthetic_key.replace("_", " ")
     platform = PLATFORM_PROFILES[platform_key]
-    short_subject = subject.split(" wearing ")[0].strip()
+    short_subject = clean_subject_phrase(subject).split(" with ")[0].split(",")[0].strip()
+    if len(short_subject) > 42:
+        short_subject = "Late-night fit"
     return [
         f"{mood.capitalize()}, but keep it effortless.",
         f"{aesthetic_name.title()} frame with real-life texture.",
@@ -392,21 +459,25 @@ def render_markdown(
     camera_key: str,
     platform_key: str,
     model_key: str,
+    quality_mode_key: str,
     lighting_key: str,
     pose_key: str,
     universal_prompt: str,
     model_specific_prompt: str,
+    clean_prompt: str,
     negative_prompt: str,
     identity_lock: dict,
     prompt_dna: dict,
     mutation_notes: dict,
     variations: list[str],
     captions: list[str],
+    quality_checklist: list[str],
     scorecard: dict,
 ) -> str:
     """Render the full result as Markdown."""
     variation_lines = "\n".join(f"{index}. {text}" for index, text in enumerate(variations, 1))
     caption_lines = "\n".join(f"- {caption}" for caption in captions)
+    checklist_lines = render_list("Prompt Quality Checklist", quality_checklist)
     dna_lines = "\n".join(f"- {key.replace('_', ' ').title()}: {value}" for key, value in prompt_dna.items())
     changed_lines = render_list("What changed", mutation_notes["what_changed"])
     problem_lines = render_list("Problems noticed", scorecard["problems_noticed"])
@@ -428,8 +499,17 @@ Generated: {created_at}
 - Camera: `{camera_key}`
 - Platform: `{platform_key}` ({PLATFORM_PROFILES[platform_key]["label"]})
 - Model profile: `{model_key}` ({MODEL_PROFILES[model_key]["label"]})
+- Quality mode: `{quality_mode_key}` ({QUALITY_MODES[quality_mode_key]["label"]})
 - Lighting: `{lighting_key}`
 - Pose: `{pose_key}`
+
+## Clean Prompt
+
+{clean_prompt}
+
+## Clean Negative Prompt
+
+{negative_prompt}
 
 ## Universal Prompt
 
@@ -479,6 +559,10 @@ Generated: {created_at}
 
 {caption_lines}
 
+## Prompt Quality Checklist
+
+{checklist_lines}
+
 ## Image Review Scorecard
 
 - Realism: {scorecard["realism"]}
@@ -511,6 +595,7 @@ def maybe_print_list_and_exit(aesthetics: dict, cameras: dict) -> None:
     print_preset_keys("Available cameras", cameras)
     print_preset_keys("Available platforms", PLATFORM_PROFILES)
     print_preset_keys("Available model profiles", MODEL_PROFILES)
+    print_preset_keys("Available quality modes", QUALITY_MODES)
     raise SystemExit(0)
 
 
@@ -833,10 +918,12 @@ def build_prompt_run_record(
     camera_key: str,
     platform_key: str,
     model_key: str,
+    quality_mode_key: str,
     lighting_key: str,
     pose_key: str,
     universal_prompt: str,
     model_specific_prompt: str,
+    clean_prompt: str,
     prompt_dna: dict,
     mutation_notes: dict,
 ) -> dict:
@@ -851,10 +938,12 @@ def build_prompt_run_record(
         "camera": camera_key,
         "platform": platform_key,
         "model_profile": model_key,
+        "quality_mode": quality_mode_key,
         "lighting": lighting_key,
         "pose": pose_key,
         "universal_prompt": universal_prompt,
         "model_specific_prompt": model_specific_prompt,
+        "clean_prompt": clean_prompt,
         "prompt_dna": prompt_dna,
         "mutation_notes": mutation_notes,
         "latest_output": str(LATEST_OUTPUT),
@@ -894,7 +983,10 @@ def main() -> None:
     print("Tip: run `python src/generate_prompt.py --random` to randomize aesthetic, camera, lighting, and pose.\n")
     print("Tip: run `python src/generate_prompt.py --evolve` to bias prompts toward learned winners.\n")
 
-    subject = ask("Subject", "a stylish person with realistic skin texture")
+    subject = ask(
+        "Subject",
+        "back-facing candid photo of a person in a fitted hat, oversized black Chrome Hearts shirt with a large cross graphic centered on the back, loose grey pants, walking through neon at night",
+    )
     if evolve_mode:
         learned_patterns = load_learned_patterns()
         selections = build_evolved_selection(learned_patterns, aesthetics, cameras, lighting, poses)
@@ -920,7 +1012,7 @@ def main() -> None:
         print(f"  Lighting: {lighting_key}")
         print(f"  Pose: {pose_key}")
     else:
-        aesthetic_key = choose_from_presets("Aesthetic", aesthetics, "quiet_luxury")
+        aesthetic_key = choose_from_presets("Aesthetic", aesthetics, "rarely_online_flash")
         camera_key = choose_from_presets("Camera", cameras, "canon_r5_50mm")
         lighting_key = choose_from_presets("Lighting", lighting, "cinematic_window")
         pose_key = choose_from_presets("Pose", poses, "candid_glance")
@@ -929,6 +1021,7 @@ def main() -> None:
     mood = ask("Mood", "confident and cinematic")
     platform_key = choose_from_presets("Platform", PLATFORM_PROFILES, "instagram_vertical_post")
     model_key = choose_from_presets("Model profile", MODEL_PROFILES, "chatgpt_image")
+    quality_mode_key = choose_from_presets("Quality mode", QUALITY_MODES, "candid_realism")
 
     universal_prompt = build_universal_prompt(
         subject,
@@ -937,6 +1030,7 @@ def main() -> None:
         mood,
         camera_key,
         platform_key,
+        quality_mode_key,
         lighting_key,
         pose_key,
         aesthetics,
@@ -945,6 +1039,7 @@ def main() -> None:
         poses,
     )
     model_specific_prompt = build_model_specific_prompt(universal_prompt, model_key, platform_key)
+    clean_prompt = build_clean_prompt(model_specific_prompt)
     identity_lock = build_identity_lock(subject)
     variations = build_variations(
         subject,
@@ -952,6 +1047,7 @@ def main() -> None:
         location,
         mood,
         platform_key,
+        quality_mode_key,
         lighting_key,
         pose_key,
         aesthetics,
@@ -959,12 +1055,14 @@ def main() -> None:
         poses,
     )
     captions = build_captions(subject, mood, aesthetic_key, platform_key)
+    quality_checklist = build_quality_checklist()
     scorecard = build_scorecard()
     run_id = uuid.uuid4().hex[:12]
     prompt_dna = build_prompt_dna(
         aesthetic_key,
         camera_key,
         platform_key,
+        quality_mode_key,
         lighting_key,
         mood,
         aesthetics,
@@ -995,16 +1093,19 @@ def main() -> None:
         camera_key,
         platform_key,
         model_key,
+        quality_mode_key,
         lighting_key,
         pose_key,
         universal_prompt,
         model_specific_prompt,
+        clean_prompt,
         negative_prompt,
         identity_lock,
         prompt_dna,
         mutation_notes,
         variations,
         captions,
+        quality_checklist,
         scorecard,
     )
 
@@ -1021,10 +1122,12 @@ def main() -> None:
             camera_key,
             platform_key,
             model_key,
+            quality_mode_key,
             lighting_key,
             pose_key,
             universal_prompt,
             model_specific_prompt,
+            clean_prompt,
             prompt_dna,
             mutation_notes,
         ),

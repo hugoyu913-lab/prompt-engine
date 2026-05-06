@@ -1,4 +1,10 @@
 {
+  "rarely_online_flash": {
+    "description": "Candid late-night direct-flash social photo with anti-influencer energy, dark shadows, off-center framing, detached mood, and understated designer clothing.",
+    "lighting": "direct flash cutting through neon night shadows, low-light noise, subtle motion blur, underexposed edges",
+    "details": ["back-facing subject", "large cross graphic centered on shirt back", "fitted hat", "oversized black shirt", "loose grey pants", "neon night walkway"],
+    "realism_notes": ["off-center framing", "low-light noise", "subtle motion blur", "believable social media photo"]
+  },
   "nightlife_flash": {
     "description": "Raw direct-flash nightlife photography with dark rooms, reflective skin, crowded backgrounds, and real party movement instead of polished studio posing.",
     "lighting": "hard on-camera flash mixed with low ambient club light, crisp face highlights, deep falloff behind the subject",

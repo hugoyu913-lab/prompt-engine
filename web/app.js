@@ -1,4 +1,10 @@
 const aesthetics = {
+  rarely_online_flash: {
+    description: "Candid late-night direct-flash social photo with anti-influencer energy, dark shadows, off-center framing, detached mood, and understated designer clothing.",
+    lighting: "direct flash cutting through neon night shadows, low-light noise, subtle motion blur, underexposed edges",
+    details: ["back-facing subject", "large cross graphic centered on shirt back", "fitted hat", "oversized black shirt", "loose grey pants", "neon night walkway"],
+    realism_notes: ["off-center framing", "low-light noise", "subtle motion blur", "believable social media photo"]
+  },
   nightlife_flash: {
     description: "Raw direct-flash nightlife photography with dark rooms, reflective skin, crowded backgrounds, and real party movement instead of polished studio posing.",
     lighting: "hard on-camera flash mixed with low ambient club light, crisp face highlights, deep falloff behind the subject",
@@ -136,6 +142,29 @@ const models = {
   stable_diffusion_flux: { label: "Stable Diffusion / Flux", instruction: "Use weighted detail-friendly phrasing, concrete camera terms, and keep negatives separate.", suffix: "high detail, natural skin texture, realistic photography" }
 };
 
+const qualityModes = {
+  pfp_mode: {
+    label: "PFP mode",
+    direction: "tight crop, iconic silhouette, simple background, strong subject read"
+  },
+  candid_realism: {
+    label: "Candid realism",
+    direction: "less polished, accidental timing, snapshot realism, off-center framing"
+  },
+  outfit_focus: {
+    label: "Outfit focus",
+    direction: "clear clothing detail, readable fabric texture, precise shirt graphics, full fit visible"
+  },
+  atmosphere_focus: {
+    label: "Atmosphere focus",
+    direction: "strong environment, practical lighting, visible background texture, night air and shadows"
+  },
+  editorial_realism: {
+    label: "Editorial realism",
+    direction: "controlled composition, believable styling, restrained polish, no luxury-ad gloss"
+  }
+};
+
 const quickPresets = {
   lonely_night_walk: {
     subject: "back-facing candid photo of a lone person in a dark oversized coat",
@@ -149,7 +178,7 @@ const quickPresets = {
   },
   underground_flash: {
     subject: "back-facing candid photo of a person leaving an underground club",
-    aesthetic: "nightlife_flash",
+    aesthetic: "rarely_online_flash",
     camera: "contax_t2",
     lighting: "direct_flash",
     pose: "candid_glance",
@@ -158,8 +187,8 @@ const quickPresets = {
     strengths: [8, 10, 8, 1, 8, 9]
   },
   chrome_hearts_fit: {
-    subject: "back-facing candid photo of a person wearing a Chrome Hearts shirt",
-    aesthetic: "nightlife_flash",
+    subject: "back-facing candid photo of a person in a fitted hat, oversized black Chrome Hearts shirt with a large cross graphic centered on the back, loose grey pants, walking through neon at night",
+    aesthetic: "rarely_online_flash",
     camera: "ricoh_gr_iii",
     lighting: "neon_night",
     pose: "candid_glance",
@@ -189,7 +218,7 @@ const quickPresets = {
   }
 };
 
-const negativePrompt = "AI-looking image, plastic skin, waxy face, over-smoothed texture, fake pores, missing pores, airbrushed face, rubber skin, distorted hands, extra fingers, missing fingers, fused fingers, broken anatomy, uneven eyes, warped face, uncanny smile, glassy eyes, crossed eyes, duplicate person, identity drift, bad teeth, melted clothing, impossible fabric folds, broken jewelry, fake logo, unreadable text, misspelled text, warped background signs, impossible shadows, mismatched reflections, over-sharpened details, oversaturated colors, harsh HDR, fantasy render, cartoon, anime, 3D render, CGI, doll-like face, overly perfect symmetry, beauty-filter face, blurry subject, noisy face, low-resolution image, watermark, signature, frame, border.";
+const negativePrompt = "AI-looking image, plastic skin, waxy face, over-smoothed texture, fake pores, missing pores, airbrushed face, rubber skin, distorted hands, extra fingers, missing fingers, fused fingers, broken anatomy, uneven eyes, warped face, uncanny smile, glassy eyes, crossed eyes, duplicate person, identity drift, bad teeth, melted clothing, impossible fabric folds, glossy plastic clothing, broken jewelry, fake luxury ad look, stiff fashion posing, over-clean AI lighting, fake logo, unreadable text, misspelled text, distorted shirt graphics, warped cross design, unreadable logo, warped background signs, impossible shadows, mismatched reflections, over-sharpened details, oversaturated colors, harsh HDR, fantasy render, cartoon, anime, 3D render, CGI, doll-like face, overly perfect symmetry, beauty-filter face, blurry subject, noisy face, low-resolution image, watermark, signature, frame, border.";
 const storageKey = "prompt-engine-web-runs";
 const favoritesKey = "prompt-engine-web-favorites";
 
@@ -204,6 +233,7 @@ const elements = {
   mood: document.querySelector("#mood"),
   platform: document.querySelector("#platform"),
   model: document.querySelector("#model"),
+  qualityMode: document.querySelector("#qualityMode"),
   strengths: {
     realism: document.querySelector("#realismStrength"),
     candidness: document.querySelector("#candidnessStrength"),
@@ -212,13 +242,16 @@ const elements = {
     distance: document.querySelector("#distanceStrength"),
     imperfection: document.querySelector("#imperfectionStrength")
   },
+  cleanPrompt: document.querySelector("#cleanPrompt"),
   universalPrompt: document.querySelector("#universalPrompt"),
   modelPrompt: document.querySelector("#modelPrompt"),
+  cleanNegativePrompt: document.querySelector("#cleanNegativePrompt"),
   negativePrompt: document.querySelector("#negativePrompt"),
   identityLock: document.querySelector("#identityLock"),
   promptDna: document.querySelector("#promptDna"),
   variations: document.querySelector("#variations"),
   captions: document.querySelector("#captions"),
+  qualityChecklist: document.querySelector("#qualityChecklist"),
   status: document.querySelector("#status"),
   toast: document.querySelector("#toast"),
   recentRuns: document.querySelector("#recentRuns"),
@@ -259,8 +292,21 @@ function readInput() {
     mood: elements.mood.value.trim() || "confident, anonymous, and cinematic",
     platformKey: elements.platform.value,
     modelKey: elements.model.value,
+    qualityModeKey: elements.qualityMode.value,
     strengths: Object.fromEntries(Object.entries(elements.strengths).map(([key, input]) => [key, Number(input.value)]))
   };
+}
+
+function cleanSubjectPhrase(subject) {
+  const prefixes = [
+    "back-facing candid photo of ",
+    "candid photo of ",
+    "photo of ",
+    "hyper-realistic photo of "
+  ];
+  const lowered = subject.toLowerCase();
+  const prefix = prefixes.find((item) => lowered.startsWith(item));
+  return prefix ? subject.slice(prefix.length).trim() : subject.trim();
 }
 
 function strengthWording(strengths) {
@@ -279,7 +325,12 @@ function buildUniversalPrompt(input) {
   const aesthetic = aesthetics[input.aestheticKey];
   const camera = cameras[input.cameraKey];
   const platform = platforms[input.platformKey];
-  return `Hyper-realistic photograph of ${input.subject} in ${input.location}. Platform: ${platform.label}; compose as ${platform.format}. Aesthetic: ${labelFor(input.aestheticKey)}. Mood: ${input.mood}. ${aesthetic.description} Scene details: ${aesthetic.details.join(", ")}. Lighting: ${lighting[input.lightingKey]}; also preserve ${aesthetic.lighting}. Camera: ${camera.label}; ${camera.look}. Pose and expression: ${poses[input.poseKey]}, lived-in body language, no stiff model posing. Creative direction strength: ${strengthWording(input.strengths)}. Realism requirements: ${aesthetic.realism_notes.join(", ")}, natural pores, tiny skin imperfections, realistic facial asymmetry, grounded wardrobe texture, accurate hands, believable lens distortion, subtle background messiness, authentic social-media framing, not over-edited, not AI-looking.`;
+  const qualityMode = qualityModes[input.qualityModeKey];
+  const cleanSubject = cleanSubjectPhrase(input.subject);
+  const subjectIntro = input.subject.toLowerCase().includes("back-facing")
+    ? `Back-facing candid late-night photo of ${cleanSubject}`
+    : `Hyper-realistic photo of ${cleanSubject}`;
+  return `${subjectIntro} at ${input.location}. ${platform.format}. ${labelFor(input.aestheticKey)} mood: ${input.mood}. ${aesthetic.description} Details: ${aesthetic.details.join(", ")}. Camera: ${camera.label}; ${camera.look}. Lighting: ${lighting[input.lightingKey]}; ${aesthetic.lighting}. Composition: ${poses[input.poseKey]}, ${qualityMode.direction}. Direction: ${strengthWording(input.strengths)}. Realism: ${aesthetic.realism_notes.join(", ")}, natural pores, accurate hands, believable lens distortion, real fabric texture, subtle background mess, not over-edited, not AI-looking.`;
 }
 
 function buildModelPrompt(universalPrompt, input) {
@@ -289,12 +340,17 @@ function buildModelPrompt(universalPrompt, input) {
   return `${model.instruction} ${universalPrompt} Prioritize believable photography, identity consistency, and ${platform.format}.${suffix}`;
 }
 
+function buildCleanPrompt(modelPrompt) {
+  return modelPrompt.replace(/\s+/g, " ").trim();
+}
+
 function buildIdentityLock(subject) {
   return [
     `Keep the same core subject: ${subject}.`,
     "Preserve face shape, apparent age range, body type, skin tone, hair length, and hair color.",
     "Preserve the back-facing candid angle unless deliberately changed.",
-    "Preserve the Chrome Hearts shirt as the wardrobe anchor when present.",
+    "For Chrome Hearts back-facing prompts: keep the large cross graphic centered on the shirt back, fitted hat, oversized black shirt, loose grey pants, candid walking posture, and neon night setting.",
+    "Do not warp shirt-back graphics, cross designs, fitted hat, oversized shirt silhouette, or loose pants.",
     "Do not add extra people unless requested.",
     "Do not glamorize so much that the person becomes a different identity."
   ];
@@ -310,6 +366,7 @@ function buildPromptDna(input) {
     `Aesthetic intensity: ${input.strengths.luxury >= 7 ? "luxury-forward" : "grounded"} ${labelFor(input.aestheticKey)}`,
     `Lighting behavior: ${lighting[input.lightingKey]}; darkness ${input.strengths.darkness}/10`,
     `Emotional tone: ${input.mood}; distance ${input.strengths.distance}/10`,
+    `Quality mode: ${qualityModes[input.qualityModeKey].label}: ${qualityModes[input.qualityModeKey].direction}`,
     `Imperfection layer: ${input.strengths.imperfection}/10`
   ];
 }
@@ -317,20 +374,36 @@ function buildPromptDna(input) {
 function buildVariations(input) {
   const aesthetic = aesthetics[input.aestheticKey];
   const platform = platforms[input.platformKey];
+  const cleanSubject = cleanSubjectPhrase(input.subject);
   const candid = input.strengths.candidness >= 7 ? "more accidental timing, less posed energy" : "controlled but natural timing";
   const imperfect = input.strengths.imperfection >= 7 ? "motion blur, analog noise, underexposed edges, imperfect crop" : "clean detail with subtle imperfections";
   return [
-    `Candid variant: ${input.subject} in ${input.location}, ${input.mood}, ${poses[input.poseKey]}, ${lighting[input.lightingKey]}, ${candid}, ${imperfect}, ${platform.format}.`,
-    `Atmosphere variant: ${input.subject} in ${input.location}, ${aesthetic.lighting}, environmental reflections, background texture, practical shadows, visible wardrobe detail, ${platform.format}.`,
-    `Detached variant: ${input.subject}, emotionally distant posture, face partially withheld, ${lighting[input.lightingKey]}, realistic fabric detail, identity locked, non-AI-looking.`
+    `Candid variant: ${cleanSubject} at ${input.location}, ${poses[input.poseKey]}, ${candid}, ${imperfect}, ${platform.format}.`,
+    `Outfit variant: ${cleanSubject}, readable clothing shape, fabric texture, shirt graphics intact, ${aesthetic.lighting}, ${platform.format}.`,
+    `Mode variant: ${qualityModes[input.qualityModeKey].direction}, same identity, ${input.location} readable, non-AI-looking.`
+  ];
+}
+
+function buildQualityChecklist() {
+  return [
+    "no contradictions",
+    "no repeated phrases",
+    "clear subject",
+    "clear camera",
+    "clear lighting",
+    "clear composition",
+    "clear realism constraints",
+    "clean negative prompt"
   ];
 }
 
 function buildCaptions(input) {
+  let shortSubject = cleanSubjectPhrase(input.subject).split(" with ")[0].split(",")[0].trim();
+  if (shortSubject.length > 42) shortSubject = "Late-night fit";
   return [
     `${input.mood.charAt(0).toUpperCase() + input.mood.slice(1)}, but keep it effortless.`,
     `${labelFor(input.aestheticKey)} frame with real-life texture.`,
-    "Back-facing, but still unmistakable.",
+    `${shortSubject} energy, caught between moments.`,
     `Saved this one for the ${platforms[input.platformKey].caption}.`,
     "Chrome, flash, motion.",
     "Looks unplanned. Was not."
@@ -353,8 +426,14 @@ function buildFullOutput(parts) {
     "## Universal Prompt",
     parts.universalPrompt,
     "",
+    "## Clean Prompt",
+    parts.cleanPrompt,
+    "",
     "## Model-Specific Prompt",
     parts.modelPrompt,
+    "",
+    "## Clean Negative Prompt",
+    parts.cleanNegativePrompt,
     "",
     "## Negative Prompt",
     parts.negativePrompt,
@@ -369,7 +448,10 @@ function buildFullOutput(parts) {
     parts.variations.map((item, index) => `${index + 1}. ${item}`).join("\n"),
     "",
     "## Captions",
-    parts.captions.map((item) => `- ${item}`).join("\n")
+    parts.captions.map((item) => `- ${item}`).join("\n"),
+    "",
+    "## Prompt Quality Checklist",
+    parts.qualityChecklist.map((item) => `- ${item}`).join("\n")
   ].join("\n");
 }
 
@@ -395,20 +477,25 @@ function generatePrompt(saveRun = false) {
   window.setTimeout(() => {
     const universalPrompt = buildUniversalPrompt(input);
     const modelPrompt = buildModelPrompt(universalPrompt, input);
+    const cleanPrompt = buildCleanPrompt(modelPrompt);
     const identityLock = buildIdentityLock(input.subject);
     const promptDna = buildPromptDna(input);
     const variations = buildVariations(input);
     const captions = buildCaptions(input);
+    const qualityChecklist = buildQualityChecklist();
 
+    elements.cleanPrompt.textContent = cleanPrompt;
     elements.universalPrompt.textContent = universalPrompt;
     elements.modelPrompt.textContent = modelPrompt;
+    elements.cleanNegativePrompt.textContent = negativePrompt;
     elements.negativePrompt.textContent = negativePrompt;
     renderList(elements.identityLock, identityLock);
     renderList(elements.promptDna, promptDna);
     renderList(elements.variations, variations);
     renderList(elements.captions, captions);
+    renderList(elements.qualityChecklist, qualityChecklist);
 
-    latestParts = { input, universalPrompt, modelPrompt, negativePrompt, identityLock, promptDna, variations, captions };
+    latestParts = { input, universalPrompt, cleanPrompt, modelPrompt, cleanNegativePrompt: negativePrompt, negativePrompt, identityLock, promptDna, variations, captions, qualityChecklist };
     latestOutput = buildFullOutput(latestParts);
     setGenerating(false);
     setStatus("Generated");
@@ -544,12 +631,13 @@ function renderRecentRuns() {
 }
 
 function init() {
-  fillSelect(elements.aesthetic, aesthetics, "nightlife_flash");
+  fillSelect(elements.aesthetic, aesthetics, "rarely_online_flash");
   fillSelect(elements.camera, cameras, "ricoh_gr_iii");
   fillSelect(elements.lighting, lighting, "neon_night");
   fillSelect(elements.pose, poses, "candid_glance");
   fillSelect(elements.platform, platforms, "instagram_vertical_post");
   fillSelect(elements.model, models, "chatgpt_image");
+  fillSelect(elements.qualityMode, qualityModes, "candid_realism");
 
   elements.form.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -579,7 +667,8 @@ function init() {
     elements.lighting,
     elements.pose,
     elements.platform,
-    elements.model
+    elements.model,
+    elements.qualityMode
   ].forEach((input) => {
     input.addEventListener("change", () => generatePrompt());
   });
@@ -587,7 +676,9 @@ function init() {
     button.addEventListener("click", () => {
       const target = button.dataset.copy;
       const map = {
+        cleanPrompt: elements.cleanPrompt.textContent,
         modelPrompt: elements.modelPrompt.textContent,
+        cleanNegativePrompt: elements.cleanNegativePrompt.textContent,
         negativePrompt: elements.negativePrompt.textContent,
         fullOutput: latestOutput
       };

@@ -62,7 +62,7 @@
 
             <div class="field span-2">
               <label for="subject">Subject</label>
-              <textarea id="subject" rows="3">back-facing candid photo of a person wearing a Chrome Hearts shirt</textarea>
+              <textarea id="subject" rows="3">back-facing candid photo of a person in a fitted hat, oversized black Chrome Hearts shirt with a large cross graphic centered on the back, loose grey pants, walking through neon at night</textarea>
             </div>
 
             <div class="field">
@@ -105,6 +105,11 @@
               <select id="model"></select>
             </div>
 
+            <div class="field">
+              <label for="qualityMode">Quality mode</label>
+              <select id="qualityMode"></select>
+            </div>
+
             <div class="strength-grid span-2">
               <div class="panel-header">
                 <p class="eyebrow">Prompt Strength</p>
@@ -139,12 +144,23 @@
 
         <aside class="output-panel glass-panel">
           <div class="output-actions">
+            <button type="button" data-copy="cleanPrompt">Copy Clean Prompt</button>
             <button type="button" data-copy="modelPrompt">Copy Model-Specific Prompt</button>
-            <button type="button" data-copy="negativePrompt">Copy Negative Prompt</button>
+            <button type="button" data-copy="cleanNegativePrompt">Copy Clean Negative Prompt</button>
             <button type="button" data-copy="fullOutput">Copy Full Output</button>
           </div>
 
           <div class="output-stack" id="output">
+            <details class="output-section" open>
+              <summary>Clean Prompt</summary>
+              <p id="cleanPrompt"></p>
+            </details>
+
+            <details class="output-section" open>
+              <summary>Clean Negative Prompt</summary>
+              <p id="cleanNegativePrompt"></p>
+            </details>
+
             <details class="output-section" open>
               <summary>Universal Prompt</summary>
               <p id="universalPrompt"></p>
@@ -178,6 +194,11 @@
             <details class="output-section">
               <summary>Captions</summary>
               <ul id="captions"></ul>
+            </details>
+
+            <details class="output-section">
+              <summary>Prompt Quality Checklist</summary>
+              <ul id="qualityChecklist"></ul>
             </details>
           </div>
         </aside>
