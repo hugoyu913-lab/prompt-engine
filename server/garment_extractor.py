@@ -251,14 +251,8 @@ def extract_ssense(soup, url: str) -> dict | None:
     if not result['material']:
         result['material'] = _infer_material(full_text)
 
-    desc_lower = description.lower()
-    if desc_lower:
-        if not result['front_design']:
-            result['front_design'] = _infer_front_design(desc_lower)
-        if not result['back_design']:
-            result['back_design'] = _infer_back_design(desc_lower)
-        if not result['logo_text_placement']:
-            result['logo_text_placement'] = _infer_logo_placement(desc_lower)
+    if description:
+        _deep_parse_description(description, result)
 
     result['must_preserve'] = _build_must_preserve(result)
     result['must_avoid'] = _build_must_avoid(result)
@@ -579,6 +573,80 @@ def _infer_logo_placement(text: str) -> str:
         if m:
             parts.append(m.group(0).strip()[:80])
     return '; '.join(parts[:2])
+
+
+# ── Aggressive description parse ────────────────────────────────────────────
+
+_DESIGN_WORDS = (
+    'graphic', 'print', 'logo', 'embroid', 'patch', 'motif',
+    'artwork', 'appliqué', 'applique', 'screenprint', 'illustration',
+    'lettering', 'inscription', 'cross', 'text', 'design',
+)
+
+_FIT_WORDS = (
+    ('oversized fit', 'oversized fit'),
+    ('relaxed fit', 'relaxed fit'),
+    ('slim fit', 'slim fit'),
+    ('regular fit', 'regular fit'),
+    ('oversized', 'oversized'),
+    ('relaxed', 'relaxed'),
+    ('boxy', 'boxy'),
+    ('slim', 'slim'),
+    ('regular', 'regular'),
+    ('loose', 'loose'),
+    ('fitted', 'fitted'),
+    ('straight', 'straight'),
+)
+
+
+def _deep_parse_description(description: str, result: dict) -> None:
+    """Sentence-level parse of the full description. Mutates result in-place."""
+    desc_lower = description.lower()
+    sentences = re.split(r'[.;!\n]+', description)
+    sentences_lower = [s.lower().strip() for s in sentences]
+
+    # Fit — scan full description for any fit keyword, return the keyword itself
+    if not result.get('fit'):
+        for kw, label in _FIT_WORDS:
+            if kw in desc_lower:
+                result['fit'] = label
+                break
+
+    # Is any design word present anywhere in the description?
+    has_design = any(w in desc_lower for w in _DESIGN_WORDS)
+
+    # Front design — collect sentences mentioning front/chest
+    if not result.get('front_design'):
+        front_sents = [
+            s.strip() for s, sl in zip(sentences, sentences_lower)
+            if ('front' in sl or 'chest' in sl) and s.strip()
+        ]
+        if front_sents and has_design:
+            result['front_design'] = '; '.join(front_sents)[:240]
+        elif front_sents:
+            result['front_design'] = front_sents[0][:120]
+
+    # Back design — collect sentences mentioning back
+    if not result.get('back_design'):
+        back_sents = [
+            s.strip() for s, sl in zip(sentences, sentences_lower)
+            if 'back' in sl and s.strip()
+        ]
+        if back_sents and has_design:
+            result['back_design'] = '; '.join(back_sents)[:240]
+        elif back_sents:
+            result['back_design'] = back_sents[0][:120]
+
+    # Logo/graphic placement — collect every sentence with a design word
+    if not result.get('logo_text_placement'):
+        logo_sents = [
+            s.strip() for s, sl in zip(sentences, sentences_lower)
+            if any(w in sl for w in ('logo', 'graphic', 'branding',
+                                     'embroid', 'print', 'motif', 'appliqué'))
+            and s.strip()
+        ]
+        if logo_sents:
+            result['logo_text_placement'] = '; '.join(logo_sents)[:240]
 
 
 # ── Must preserve / avoid builders ──────────────────────────────────────────
