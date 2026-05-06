@@ -235,18 +235,18 @@ const elements = {
   model: document.querySelector("#model"),
   qualityMode: document.querySelector("#qualityMode"),
   garmentAccuracyMode: document.querySelector("#garmentAccuracyMode"),
-  garmentBrand: document.querySelector("#garmentBrand"),
-  garmentProductName: document.querySelector("#garmentProductName"),
-  garmentProductUrl: document.querySelector("#garmentProductUrl"),
+  garmentBrand: document.querySelector("#brand"),
+  garmentProductName: document.querySelector("#productName"),
+  garmentProductUrl: document.querySelector("#productUrl"),
   garmentType: document.querySelector("#garmentType"),
-  garmentColor: document.querySelector("#garmentColor"),
-  garmentFit: document.querySelector("#garmentFit"),
-  garmentMaterial: document.querySelector("#garmentMaterial"),
-  garmentFrontDesign: document.querySelector("#garmentFrontDesign"),
-  garmentBackDesign: document.querySelector("#garmentBackDesign"),
-  garmentLogoPlacement: document.querySelector("#garmentLogoPlacement"),
-  garmentMustPreserve: document.querySelector("#garmentMustPreserve"),
-  garmentMustAvoid: document.querySelector("#garmentMustAvoid"),
+  garmentColor: document.querySelector("#color"),
+  garmentFit: document.querySelector("#fit"),
+  garmentMaterial: document.querySelector("#material"),
+  garmentFrontDesign: document.querySelector("#frontDesign"),
+  garmentBackDesign: document.querySelector("#backDesign"),
+  garmentLogoPlacement: document.querySelector("#logoPlacement"),
+  garmentMustPreserve: document.querySelector("#mustPreserve"),
+  garmentMustAvoid: document.querySelector("#mustAvoid"),
   strengths: {
     realism: document.querySelector("#realismStrength"),
     candidness: document.querySelector("#candidnessStrength"),
@@ -276,10 +276,12 @@ const elements = {
   previewPlatform: document.querySelector("#previewPlatform"),
   generateButton: document.querySelector("#generateButton"),
   stickyGenerateButton: document.querySelector("#stickyGenerateButton"),
-  extractFromUrl: document.querySelector("#extractFromUrl"),
+  extractBtn: document.querySelector("#extractBtn"),
   extractStatus: document.querySelector("#extractStatus"),
-  referenceImagesSection: document.querySelector("#referenceImagesSection"),
-  referenceThumbnails: document.querySelector("#referenceThumbnails")
+  extractedImages: document.querySelector("#extractedImages"),
+  accordionBody: document.querySelector("#accordionBody"),
+  accordionLabel: document.querySelector("#accordionLabel"),
+  accordionArrow: document.querySelector("#accordionArrow")
 };
 
 let latestOutput = "";
@@ -716,97 +718,95 @@ function renderRecentRuns() {
   });
 }
 
-async function extractGarmentFromUrl() {
+function toggleGarmentAccordion(forceOpen = null) {
+  const isOpen = elements.accordionBody.style.display !== "none";
+  const shouldOpen = forceOpen !== null ? forceOpen : !isOpen;
+  elements.accordionBody.style.display = shouldOpen ? "block" : "none";
+  elements.accordionArrow.textContent = shouldOpen ? "▴" : "▾";
+  elements.accordionLabel.textContent = shouldOpen ? "Hide garment details" : "Edit garment details";
+}
+
+async function runExtraction() {
   const url = elements.garmentProductUrl.value.trim();
+  const status = elements.extractStatus;
+  const btn = elements.extractBtn;
+
   if (!url) {
-    showExtractStatus("error", "Paste a product URL first.");
+    status.className = "extract-status error";
+    status.textContent = "Paste a product URL first.";
     return;
   }
 
-  elements.extractFromUrl.disabled = true;
-  elements.extractFromUrl.textContent = "Extracting…";
-  showExtractStatus("", "Fetching product data…");
+  status.className = "extract-status loading";
+  status.textContent = "Extracting garment data…";
+  btn.disabled = true;
 
   try {
-    const response = await fetch("http://localhost:5050/extract-garment", {
+    const res = await fetch("http://localhost:5050/extract-garment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url })
     });
 
-    const data = await response.json();
+    const data = await res.json();
 
-    if (!response.ok) {
-      showExtractStatus("error", data.error || "Extraction failed.");
-      return;
+    if (!res.ok || data.error) {
+      throw new Error(data.error || "Extraction failed");
     }
 
-    fillGarmentFields(data);
-    showReferenceImages(data.image_urls || []);
+    const fieldMap = {
+      garmentBrand: data.brand,
+      garmentProductName: data.product_name,
+      garmentType: data.garment_type,
+      garmentColor: data.color,
+      garmentFit: data.fit,
+      garmentMaterial: data.material,
+      garmentFrontDesign: data.front_design,
+      garmentBackDesign: data.back_design,
+      garmentLogoPlacement: data.logo_text_placement,
+      garmentMustPreserve: data.must_preserve,
+      garmentMustAvoid: data.must_avoid
+    };
+    Object.entries(fieldMap).forEach(([key, value]) => {
+      if (value && elements[key]) elements[key].value = value;
+    });
+
+    const imgContainer = elements.extractedImages;
+    imgContainer.innerHTML = "";
+    const imgs = data.image_urls || [];
+    if (imgs.length) {
+      imgs.slice(0, 6).forEach((src) => {
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = "Product reference";
+        img.title = "Click to open full image";
+        img.addEventListener("click", () => window.open(src, "_blank"));
+        img.addEventListener("error", () => img.remove());
+        imgContainer.appendChild(img);
+      });
+      imgContainer.style.display = "flex";
+    } else {
+      imgContainer.style.display = "none";
+    }
+
+    toggleGarmentAccordion(true);
+    generatePrompt();
 
     const notes = data.extraction_notes || [];
-    const msg = notes.length
-      ? `Extracted. ${notes.join(" ")}`
-      : "Garment details extracted successfully.";
-    showExtractStatus("success", msg);
+    status.className = "extract-status success";
+    status.textContent = notes.length
+      ? `✓ Extracted. ${notes.join(" ")}`
+      : `✓ Extracted: ${[data.brand, data.product_name].filter(Boolean).join(" ")}`;
   } catch (err) {
+    status.className = "extract-status error";
     if (err instanceof TypeError && err.message.toLowerCase().includes("fetch")) {
-      showExtractStatus("error", "Cannot reach backend. Run: python server/app.py");
+      status.textContent = "✗ Cannot reach backend. Run: python server/app.py";
     } else {
-      showExtractStatus("error", `Error: ${err.message}`);
+      status.textContent = `✗ ${err.message}`;
     }
   } finally {
-    elements.extractFromUrl.disabled = false;
-    elements.extractFromUrl.textContent = "Extract from URL";
+    btn.disabled = false;
   }
-}
-
-function fillGarmentFields(data) {
-  const fieldMap = {
-    garmentBrand: data.brand,
-    garmentProductName: data.product_name,
-    garmentType: data.garment_type,
-    garmentColor: data.color,
-    garmentFit: data.fit,
-    garmentMaterial: data.material,
-    garmentFrontDesign: data.front_design,
-    garmentBackDesign: data.back_design,
-    garmentLogoPlacement: data.logo_text_placement,
-    garmentMustPreserve: data.must_preserve,
-    garmentMustAvoid: data.must_avoid
-  };
-  Object.entries(fieldMap).forEach(([key, value]) => {
-    if (value && elements[key]) {
-      elements[key].value = value;
-    }
-  });
-  generatePrompt();
-}
-
-function showReferenceImages(urls) {
-  elements.referenceThumbnails.innerHTML = "";
-  if (!urls.length) {
-    elements.referenceImagesSection.hidden = true;
-    return;
-  }
-  urls.forEach((url) => {
-    const img = document.createElement("img");
-    img.src = url;
-    img.alt = "Product reference";
-    img.className = "reference-thumbnail";
-    img.title = "Click to open full image";
-    img.addEventListener("click", () => window.open(url, "_blank"));
-    img.addEventListener("error", () => img.remove());
-    elements.referenceThumbnails.appendChild(img);
-  });
-  elements.referenceImagesSection.hidden = false;
-}
-
-function showExtractStatus(type, message) {
-  const el = elements.extractStatus;
-  el.textContent = message;
-  el.className = "extract-status" + (type ? " " + type : "");
-  el.hidden = !message;
 }
 
 function init() {
@@ -822,7 +822,8 @@ function init() {
     event.preventDefault();
     generatePrompt(true);
   });
-  elements.extractFromUrl.addEventListener("click", extractGarmentFromUrl);
+  elements.extractBtn.addEventListener("click", runExtraction);
+  document.querySelector("#accordionToggle").addEventListener("click", () => toggleGarmentAccordion());
   document.querySelector("#randomize").addEventListener("click", randomize);
   document.querySelector("#clear").addEventListener("click", clearForm);
   document.querySelector("#savePrompt").addEventListener("click", () => saveCurrentPrompt(false));

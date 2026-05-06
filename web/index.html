@@ -123,71 +123,83 @@
             </div>
 
             <section class="garment-panel span-2">
-              <div class="panel-header">
+              <div class="section-header">
                 <p class="eyebrow">Garment Reference / Clothing Accuracy</p>
-                <label class="toggle-row" for="garmentAccuracyMode">
+                <label class="toggle-label">
                   <input type="checkbox" id="garmentAccuracyMode" checked>
-                  Garment Accuracy Mode
+                  <span>Garment Accuracy Mode</span>
                 </label>
               </div>
 
-              <div class="garment-grid">
-                <div class="field">
-                  <label for="garmentBrand">Brand</label>
-                  <input id="garmentBrand" value="Chrome Hearts">
-                </div>
-                <div class="field">
-                  <label for="garmentProductName">Product name</label>
-                  <input id="garmentProductName" value="black cross back short sleeve shirt">
-                </div>
-                <div class="field span-2">
-                  <label for="garmentProductUrl">Product URL</label>
-                  <div class="url-extract-row">
-                    <input id="garmentProductUrl" placeholder="Paste product URL to auto-fill garment fields">
-                    <button type="button" id="extractFromUrl" class="extract-btn">Extract from URL</button>
+              <div class="url-extract-block">
+                <input type="url" id="productUrl" class="url-input-large" placeholder="Paste product URL to auto-fill garment details...">
+                <button type="button" id="extractBtn" class="btn-extract-primary">Extract from URL</button>
+                <div id="extractStatus" class="extract-status"></div>
+              </div>
+
+              <div id="extractedImages" class="extracted-images-row" style="display:none;"></div>
+
+              <div class="reference-reminder">
+                <strong>Reference Image Reminder:</strong> For exact logos, prints, or graphics — upload one of these images as a visual reference to your image model. Text prompts alone cannot guarantee exact reproduction of specific logos or graphics.
+              </div>
+
+              <div class="garment-accordion" id="garmentAccordion">
+                <button type="button" class="accordion-toggle" id="accordionToggle">
+                  <span id="accordionLabel">Edit garment details</span>
+                  <span id="accordionArrow">▾</span>
+                </button>
+
+                <div class="accordion-body" id="accordionBody" style="display:none;">
+                  <div class="field-row">
+                    <div class="field-group">
+                      <label for="brand">Brand</label>
+                      <input type="text" id="brand" placeholder="e.g. Chrome Hearts">
+                    </div>
+                    <div class="field-group">
+                      <label for="productName">Product name</label>
+                      <input type="text" id="productName" placeholder="e.g. Black Cross Back Tee">
+                    </div>
                   </div>
-                  <div id="extractStatus" class="extract-status" hidden></div>
-                </div>
-                <div class="field span-2" id="referenceImagesSection" hidden>
-                  <label>Extracted Product Images</label>
-                  <div class="reference-thumbnails" id="referenceThumbnails"></div>
-                  <p class="reference-reminder"><strong>Reference Image Reminder:</strong> For exact logos, prints, or graphics — upload one of these images as a visual reference to your image model. Text prompts alone cannot guarantee exact reproduction of specific logos or graphics.</p>
-                </div>
-                <div class="field">
-                  <label for="garmentType">Garment type</label>
-                  <input id="garmentType" value="oversized short sleeve shirt">
-                </div>
-                <div class="field">
-                  <label for="garmentColor">Color</label>
-                  <input id="garmentColor" value="black">
-                </div>
-                <div class="field">
-                  <label for="garmentFit">Fit</label>
-                  <input id="garmentFit" value="oversized body, relaxed sleeves">
-                </div>
-                <div class="field">
-                  <label for="garmentMaterial">Material</label>
-                  <input id="garmentMaterial" value="cotton jersey with natural fabric drape">
-                </div>
-                <div class="field span-2">
-                  <label for="garmentFrontDesign">Front design</label>
-                  <input id="garmentFrontDesign" value="minimal front, no invented chest graphic">
-                </div>
-                <div class="field span-2">
-                  <label for="garmentBackDesign">Back design</label>
-                  <input id="garmentBackDesign" value="large cross graphic centered on the shirt back">
-                </div>
-                <div class="field span-2">
-                  <label for="garmentLogoPlacement">Logo/text placement</label>
-                  <input id="garmentLogoPlacement" value="back graphic centered, no random text, no shifted logo placement">
-                </div>
-                <div class="field span-2">
-                  <label for="garmentMustPreserve">Must preserve</label>
-                  <textarea id="garmentMustPreserve" rows="2">exact shirt structure, large centered back cross graphic, black color, oversized fit, natural cotton folds</textarea>
-                </div>
-                <div class="field span-2">
-                  <label for="garmentMustAvoid">Must avoid</label>
-                  <textarea id="garmentMustAvoid" rows="2">invented graphics, random gothic symbols, duplicated back graphic, altered logo placement, fantasy streetwear design</textarea>
+                  <div class="field-row">
+                    <div class="field-group">
+                      <label for="garmentType">Garment type</label>
+                      <input type="text" id="garmentType" placeholder="e.g. oversized short sleeve shirt">
+                    </div>
+                    <div class="field-group">
+                      <label for="color">Color</label>
+                      <input type="text" id="color" placeholder="e.g. black">
+                    </div>
+                  </div>
+                  <div class="field-row">
+                    <div class="field-group">
+                      <label for="fit">Fit</label>
+                      <input type="text" id="fit" placeholder="e.g. oversized body, relaxed sleeves">
+                    </div>
+                    <div class="field-group">
+                      <label for="material">Material</label>
+                      <input type="text" id="material" placeholder="e.g. cotton jersey">
+                    </div>
+                  </div>
+                  <div class="field-group full-width">
+                    <label for="frontDesign">Front design</label>
+                    <input type="text" id="frontDesign" placeholder="e.g. minimal front, no chest graphic">
+                  </div>
+                  <div class="field-group full-width">
+                    <label for="backDesign">Back design</label>
+                    <input type="text" id="backDesign" placeholder="e.g. large cross graphic centered on back">
+                  </div>
+                  <div class="field-group full-width">
+                    <label for="logoPlacement">Logo/text placement</label>
+                    <input type="text" id="logoPlacement" placeholder="e.g. back graphic centered">
+                  </div>
+                  <div class="field-group full-width">
+                    <label for="mustPreserve">Must preserve</label>
+                    <textarea id="mustPreserve" rows="2" placeholder="e.g. exact shirt structure, large centered back cross graphic..."></textarea>
+                  </div>
+                  <div class="field-group full-width">
+                    <label for="mustAvoid">Must avoid</label>
+                    <textarea id="mustAvoid" rows="2" placeholder="e.g. invented graphics, random gothic symbols..."></textarea>
+                  </div>
                 </div>
               </div>
             </section>
