@@ -1,52 +1,92 @@
 {
   "nightlife_flash": {
-    "description": "Direct flash nightlife photography with glossy skin, dark backgrounds, motion energy, and confident party styling.",
-    "lighting": "hard direct flash, deep ambient shadows, reflective highlights",
-    "details": ["club entrance", "late-night energy", "slight motion blur", "candid confidence"]
+    "description": "Raw direct-flash nightlife photography with dark rooms, reflective skin, crowded backgrounds, and real party movement instead of polished studio posing.",
+    "lighting": "hard on-camera flash mixed with low ambient club light, crisp face highlights, deep falloff behind the subject",
+    "details": ["club entrance", "wristband", "slight motion blur", "glossy skin", "crowded background"],
+    "realism_notes": ["flash shadow behind jawline", "slightly imperfect crop", "visible skin texture"]
   },
   "quiet_luxury": {
-    "description": "Understated wealth, premium textures, neutral styling, elegant restraint, and polished realism.",
-    "lighting": "soft window light with controlled shadows",
-    "details": ["cashmere", "tailored basics", "minimal jewelry", "expensive simplicity"]
+    "description": "Understated premium lifestyle photography with calm confidence, expensive natural textures, neutral colors, and restrained composition.",
+    "lighting": "soft side-window light with gentle shadow detail and no harsh beauty retouching",
+    "details": ["cashmere", "tailored basics", "brushed metal watch", "stone interior", "clean negative space"],
+    "realism_notes": ["natural fabric wrinkles", "subtle under-eye texture", "realistic room reflections"]
   },
   "tokyo_streetwear": {
-    "description": "Urban Tokyo fashion, layered streetwear, neon signage, dense streets, and effortless cool.",
-    "lighting": "mixed neon and street lighting",
-    "details": ["crosswalks", "convenience store glow", "layered silhouettes", "rain-slick pavement"]
+    "description": "Dense urban street fashion with layered silhouettes, practical city light, real pavement texture, and a candid Tokyo-night feel.",
+    "lighting": "mixed neon signs, vending-machine glow, and streetlamp spill with realistic color contamination",
+    "details": ["crosswalks", "convenience store glow", "layered silhouettes", "rain-slick pavement", "background pedestrians"],
+    "realism_notes": ["uneven street light on face", "slight background blur", "natural clothing folds"]
   },
   "gym_discipline": {
-    "description": "Focused training photography with sweat, discipline, athletic texture, and controlled intensity.",
-    "lighting": "overhead gym lighting with cinematic contrast",
-    "details": ["chalk dust", "metal equipment", "sweat texture", "focused expression"]
+    "description": "Focused training photography with physical effort, sweat, equipment wear, chalk, and disciplined body language.",
+    "lighting": "industrial overhead gym light with controlled contrast and practical highlights on sweat",
+    "details": ["chalk dust", "metal equipment", "sweat texture", "focused expression", "rubber floor"],
+    "realism_notes": ["redness in skin", "creased workout clothing", "realistic grip tension"]
   },
   "soft_pinterest": {
-    "description": "Soft lifestyle imagery with natural colors, cozy styling, gentle posing, and aspirational calm.",
-    "lighting": "diffused daylight with warm bounce",
-    "details": ["linen textures", "coffee tones", "soft focus background", "clean composition"]
+    "description": "Soft lifestyle imagery with calm domestic detail, muted colors, clean styling, and believable casual composition.",
+    "lighting": "diffused daylight with warm bounce from interior walls and soft background falloff",
+    "details": ["linen textures", "coffee tones", "soft background", "clean composition", "morning light"],
+    "realism_notes": ["stray hair", "natural hand placement", "soft but visible pores"]
   },
   "cyber_grunge": {
-    "description": "Raw futuristic street mood with cyber details, grit, neon contrast, and imperfect realism.",
-    "lighting": "neon rim light with dirty practical light",
-    "details": ["scratched surfaces", "underground setting", "techwear", "high contrast color"]
+    "description": "Gritty future-street styling with techwear, scratched surfaces, neon spill, and grounded documentary realism.",
+    "lighting": "neon rim light, dirty practical light, and high-contrast shadows without fantasy glow",
+    "details": ["scratched surfaces", "underground setting", "techwear", "wet concrete", "visible cables"],
+    "realism_notes": ["dirty floor texture", "imperfect makeup", "realistic neon reflections"]
   },
   "old_money": {
-    "description": "Classic heritage styling, country club polish, vintage wealth cues, and timeless restraint.",
-    "lighting": "golden afternoon light with soft shadows",
-    "details": ["tailored blazer", "vintage car", "ivy architecture", "subtle confidence"]
+    "description": "Classic heritage styling with tailored clothing, ivy architecture, vintage leisure cues, and timeless restraint.",
+    "lighting": "golden afternoon light with soft shadows and warm architectural bounce",
+    "details": ["tailored blazer", "vintage car", "ivy architecture", "leather shoes", "subtle confidence"],
+    "realism_notes": ["worn leather texture", "natural hair flyaways", "soft eye wrinkles"]
   },
   "candid_digital_camera": {
-    "description": "Early digital camera realism with casual framing, authentic flash, and imperfect snapshot charm.",
-    "lighting": "compact-camera flash with ambient spill",
-    "details": ["slight red-eye risk", "real snapshot framing", "casual pose", "date-night energy"]
+    "description": "Early digital-camera social photography with imperfect flash, casual framing, real friend-group energy, and snapshot authenticity.",
+    "lighting": "compact-camera flash with ambient spill and small hard catchlights",
+    "details": ["slight red-eye risk", "real snapshot framing", "casual pose", "date-night energy", "messy background"],
+    "realism_notes": ["minor blur", "uneven exposure", "authentic flash shine"]
   },
   "cinematic_lonely": {
-    "description": "Moody solitary cinematic photography with negative space, emotional quiet, and filmic color.",
-    "lighting": "single practical light with soft falloff",
-    "details": ["empty street", "distant background", "reflective mood", "subtle grain"]
+    "description": "Moody solitary photography with quiet negative space, practical light sources, filmic color, and restrained emotion.",
+    "lighting": "single practical light with soft falloff, muted shadows, and natural darkness",
+    "details": ["empty street", "distant background", "reflective mood", "subtle grain", "wide negative space"],
+    "realism_notes": ["low-light noise", "soft background detail", "natural posture fatigue"]
   },
   "fashion_editorial": {
-    "description": "High-end editorial photography with strong styling, controlled posing, and magazine-grade composition.",
-    "lighting": "large softbox key with sculpted fill",
-    "details": ["intentional pose", "premium wardrobe", "clean backdrop", "sharp styling"]
+    "description": "Magazine-grade fashion photography with precise styling, controlled light, sharp wardrobe detail, and human realism intact.",
+    "lighting": "large softbox key with sculpted fill, controlled shadows, and realistic skin highlights",
+    "details": ["intentional pose", "premium wardrobe", "clean backdrop", "sharp styling", "editorial crop"],
+    "realism_notes": ["visible textile weave", "skin texture preserved", "natural asymmetry"]
+  },
+  "desert_minimal": {
+    "description": "Sparse desert lifestyle photography with sun-washed tones, simple silhouettes, open space, and quiet confidence.",
+    "lighting": "low desert sun with warm rim light, pale sky bounce, and dry natural shadows",
+    "details": ["sand texture", "linen outfit", "distant mountains", "minimal styling", "wind movement"],
+    "realism_notes": ["squint from sunlight", "dust on shoes", "wind-touched hair"]
+  },
+  "miami_flash": {
+    "description": "Glossy coastal nightlife photography with direct flash, humid skin, colorful interiors, and vacation-party realism.",
+    "lighting": "direct flash over warm bar lights, reflective surfaces, and saturated but believable color",
+    "details": ["palm shadows", "chrome bar detail", "humid skin glow", "white outfit", "bright wall color"],
+    "realism_notes": ["flash reflection on skin", "slight color cast", "realistic background clutter"]
+  },
+  "clean_creator": {
+    "description": "Modern creator portrait with bright workspace detail, natural tech objects, polished but believable personal-brand styling.",
+    "lighting": "clean window light mixed with soft monitor glow and gentle shadow detail",
+    "details": ["desk setup", "laptop glow", "minimal outfit", "organized workspace", "natural posture"],
+    "realism_notes": ["screen reflections", "minor desk clutter", "realistic hand position"]
+  },
+  "coastal_film": {
+    "description": "Relaxed coastal film photography with salt-air texture, soft color, wind movement, and nostalgic realism.",
+    "lighting": "soft beach haze with warm backlight and low-contrast filmic shadows",
+    "details": ["windy hair", "washed cotton", "shoreline", "film grain", "sun-faded colors"],
+    "realism_notes": ["sand on fabric", "skin redness from sun", "organic film grain"]
+  },
+  "downtown_model_off_duty": {
+    "description": "Off-duty street style with realistic city errands, confident casual clothing, paparazzi-adjacent framing, and natural movement.",
+    "lighting": "open shade between buildings with street reflections and neutral daylight",
+    "details": ["coffee cup", "sunglasses", "oversized coat", "city sidewalk", "passing traffic"],
+    "realism_notes": ["walking motion", "natural jaw tension", "wrinkled outerwear"]
   }
 }

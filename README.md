@@ -43,7 +43,15 @@ The CLI asks for:
 - camera
 - platform
 
-Press Enter to use the suggested default when one is shown. The final result includes the main prompt, negative prompt, three variations, and social media caption ideas.
+Press Enter to use the suggested default when one is shown. The final result includes the main prompt, negative prompt, three variations, social media caption ideas, and an image review scorecard.
+
+To list available aesthetics and cameras without generating a prompt:
+
+```bash
+python src/generate_prompt.py --list
+```
+
+During aesthetic or camera selection, type `list` to show available options again. If an option does not exist, the CLI asks again instead of silently using the wrong preset.
 
 ## Available Aesthetics
 
@@ -57,6 +65,11 @@ Press Enter to use the suggested default when one is shown. The final result inc
 - `candid_digital_camera`
 - `cinematic_lonely`
 - `fashion_editorial`
+- `desert_minimal`
+- `miami_flash`
+- `clean_creator`
+- `coastal_film`
+- `downtown_model_off_duty`
 
 ## Roadmap Ideas
 

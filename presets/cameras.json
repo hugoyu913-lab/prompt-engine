@@ -1,26 +1,26 @@
 {
   "iphone_portrait": {
     "label": "iPhone portrait mode",
-    "look": "natural smartphone depth, crisp face detail, social-media-native framing"
+    "look": "current smartphone realism, slight computational depth, crisp face detail, familiar vertical framing, natural social-media polish"
   },
   "canon_r5_50mm": {
     "label": "Canon R5 with 50mm lens",
-    "look": "sharp full-frame portrait, natural compression, creamy background separation"
+    "look": "sharp full-frame portrait, natural compression, detailed skin texture, creamy but believable background separation"
   },
   "sony_a7siii_35mm": {
     "label": "Sony A7S III with 35mm lens",
-    "look": "cinematic low-light realism, clean shadows, documentary perspective"
+    "look": "cinematic low-light realism, clean shadows, documentary perspective, strong night detail without looking rendered"
   },
   "fuji_x100v": {
     "label": "Fujifilm X100V",
-    "look": "compact street photography feel, film-like color, honest detail"
+    "look": "compact street photography feel, film-like color, honest detail, natural highlight rolloff, candid framing"
   },
   "contax_t2": {
     "label": "Contax T2 film camera",
-    "look": "premium point-and-shoot film look, organic grain, soft highlight rolloff"
+    "look": "premium point-and-shoot film look, organic grain, soft highlight rolloff, realistic flash and imperfect focus"
   },
   "ricoh_gr_iii": {
     "label": "Ricoh GR III",
-    "look": "wide candid street-photo realism, compact-camera immediacy, textured detail"
+    "look": "wide candid street-photo realism, compact-camera immediacy, textured detail, slightly raw everyday perspective"
   }
 }
