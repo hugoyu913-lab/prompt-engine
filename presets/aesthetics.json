@@ -1,0 +1,52 @@
+{
+  "nightlife_flash": {
+    "description": "Direct flash nightlife photography with glossy skin, dark backgrounds, motion energy, and confident party styling.",
+    "lighting": "hard direct flash, deep ambient shadows, reflective highlights",
+    "details": ["club entrance", "late-night energy", "slight motion blur", "candid confidence"]
+  },
+  "quiet_luxury": {
+    "description": "Understated wealth, premium textures, neutral styling, elegant restraint, and polished realism.",
+    "lighting": "soft window light with controlled shadows",
+    "details": ["cashmere", "tailored basics", "minimal jewelry", "expensive simplicity"]
+  },
+  "tokyo_streetwear": {
+    "description": "Urban Tokyo fashion, layered streetwear, neon signage, dense streets, and effortless cool.",
+    "lighting": "mixed neon and street lighting",
+    "details": ["crosswalks", "convenience store glow", "layered silhouettes", "rain-slick pavement"]
+  },
+  "gym_discipline": {
+    "description": "Focused training photography with sweat, discipline, athletic texture, and controlled intensity.",
+    "lighting": "overhead gym lighting with cinematic contrast",
+    "details": ["chalk dust", "metal equipment", "sweat texture", "focused expression"]
+  },
+  "soft_pinterest": {
+    "description": "Soft lifestyle imagery with natural colors, cozy styling, gentle posing, and aspirational calm.",
+    "lighting": "diffused daylight with warm bounce",
+    "details": ["linen textures", "coffee tones", "soft focus background", "clean composition"]
+  },
+  "cyber_grunge": {
+    "description": "Raw futuristic street mood with cyber details, grit, neon contrast, and imperfect realism.",
+    "lighting": "neon rim light with dirty practical light",
+    "details": ["scratched surfaces", "underground setting", "techwear", "high contrast color"]
+  },
+  "old_money": {
+    "description": "Classic heritage styling, country club polish, vintage wealth cues, and timeless restraint.",
+    "lighting": "golden afternoon light with soft shadows",
+    "details": ["tailored blazer", "vintage car", "ivy architecture", "subtle confidence"]
+  },
+  "candid_digital_camera": {
+    "description": "Early digital camera realism with casual framing, authentic flash, and imperfect snapshot charm.",
+    "lighting": "compact-camera flash with ambient spill",
+    "details": ["slight red-eye risk", "real snapshot framing", "casual pose", "date-night energy"]
+  },
+  "cinematic_lonely": {
+    "description": "Moody solitary cinematic photography with negative space, emotional quiet, and filmic color.",
+    "lighting": "single practical light with soft falloff",
+    "details": ["empty street", "distant background", "reflective mood", "subtle grain"]
+  },
+  "fashion_editorial": {
+    "description": "High-end editorial photography with strong styling, controlled posing, and magazine-grade composition.",
+    "lighting": "large softbox key with sculpted fill",
+    "details": ["intentional pose", "premium wardrobe", "clean backdrop", "sharp styling"]
+  }
+}

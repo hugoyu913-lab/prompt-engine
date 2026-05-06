@@ -1,0 +1,10 @@
+{
+  "cinematic_window": "soft cinematic window light, natural falloff, realistic catchlights",
+  "direct_flash": "direct on-camera flash, crisp shadows, glossy highlights, nightlife realism",
+  "golden_hour": "low golden-hour sun, warm edge light, long natural shadows",
+  "neon_night": "neon practical lights, colored rim light, dark ambient contrast",
+  "overcast_soft": "large overcast sky light, soft shadows, even skin tones",
+  "studio_editorial": "large softbox key light, subtle fill, clean editorial contrast",
+  "gym_overhead": "industrial overhead lighting, realistic sweat highlights, controlled contrast",
+  "practical_lamp": "single practical lamp source, intimate shadows, cinematic warmth"
+}
