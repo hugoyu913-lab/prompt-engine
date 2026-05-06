@@ -42,8 +42,9 @@ The CLI asks for:
 - mood
 - camera
 - platform
+- model profile
 
-Press Enter to use the suggested default when one is shown. The final result includes the main prompt, negative prompt, three variations, social media caption ideas, and an image review scorecard.
+Press Enter to use the suggested default when one is shown. The final result includes a universal prompt, model-specific prompt, negative prompt, identity lock, three variations, captions, and an image review scorecard.
 
 To list available aesthetics and cameras without generating a prompt:
 
@@ -52,6 +53,26 @@ python src/generate_prompt.py --list
 ```
 
 During aesthetic or camera selection, type `list` to show available options again. If an option does not exist, the CLI asks again instead of silently using the wrong preset.
+
+To randomize aesthetic, camera, lighting, and pose while still entering subject, location, mood, platform, and model profile:
+
+```bash
+python src/generate_prompt.py --random
+```
+
+## Platform Modes
+
+- `instagram_vertical_post`
+- `tiktok_slideshow`
+- `x_twitter_image`
+- `pinterest_pin`
+- `album_cover`
+
+## Model Profiles
+
+- `midjourney`
+- `chatgpt_image`
+- `stable_diffusion_flux`
 
 ## Available Aesthetics
 
