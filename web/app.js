@@ -92,30 +92,12 @@ const aesthetics = {
 };
 
 const cameras = {
-  iphone_portrait: {
-    label: "iPhone portrait mode",
-    look: "current smartphone realism, slight computational depth, crisp face detail, familiar vertical framing, natural social-media polish"
-  },
-  canon_r5_50mm: {
-    label: "Canon R5 with 50mm lens",
-    look: "sharp full-frame portrait, natural compression, detailed skin texture, creamy but believable background separation"
-  },
-  sony_a7siii_35mm: {
-    label: "Sony A7S III with 35mm lens",
-    look: "cinematic low-light realism, clean shadows, documentary perspective, strong night detail without looking rendered"
-  },
-  fuji_x100v: {
-    label: "Fujifilm X100V",
-    look: "compact street photography feel, film-like color, honest detail, natural highlight rolloff, candid framing"
-  },
-  contax_t2: {
-    label: "Contax T2 film camera",
-    look: "premium point-and-shoot film look, organic grain, soft highlight rolloff, realistic flash and imperfect focus"
-  },
-  ricoh_gr_iii: {
-    label: "Ricoh GR III",
-    look: "wide candid street-photo realism, compact-camera immediacy, textured detail, slightly raw everyday perspective"
-  }
+  iphone_portrait: { label: "iPhone portrait mode", look: "current smartphone realism, slight computational depth, crisp face detail, familiar vertical framing, natural social-media polish" },
+  canon_r5_50mm: { label: "Canon R5 with 50mm lens", look: "sharp full-frame portrait, natural compression, detailed skin texture, creamy but believable background separation" },
+  sony_a7siii_35mm: { label: "Sony A7S III with 35mm lens", look: "cinematic low-light realism, clean shadows, documentary perspective, strong night detail without looking rendered" },
+  fuji_x100v: { label: "Fujifilm X100V", look: "compact street photography feel, film-like color, honest detail, natural highlight rolloff, candid framing" },
+  contax_t2: { label: "Contax T2 film camera", look: "premium point-and-shoot film look, organic grain, soft highlight rolloff, realistic flash and imperfect focus" },
+  ricoh_gr_iii: { label: "Ricoh GR III", look: "wide candid street-photo realism, compact-camera immediacy, textured detail, slightly raw everyday perspective" }
 };
 
 const lighting = {
@@ -141,52 +123,75 @@ const poses = {
 };
 
 const platforms = {
-  instagram_vertical_post: {
-    label: "Instagram vertical post",
-    format: "4:5 vertical crop, strong first-glance composition, feed-ready polish",
-    caption: "grid"
-  },
-  tiktok_slideshow: {
-    label: "TikTok slideshow",
-    format: "9:16 vertical composition, bold subject read, clear story-frame energy",
-    caption: "slideshow"
-  },
-  x_twitter_image: {
-    label: "X/Twitter image",
-    format: "wide 16:9 or 3:2 crop, readable thumbnail, sharp central subject",
-    caption: "timeline"
-  },
-  pinterest_pin: {
-    label: "Pinterest pin",
-    format: "2:3 vertical crop, aspirational detail, save-worthy lifestyle framing",
-    caption: "pin"
-  },
-  album_cover: {
-    label: "album cover",
-    format: "square 1:1 crop, iconic central image, negative space for title placement",
-    caption: "cover"
-  }
+  instagram_vertical_post: { label: "Instagram vertical post", format: "4:5 vertical crop, strong first-glance composition, feed-ready polish", caption: "grid" },
+  tiktok_slideshow: { label: "TikTok slideshow", format: "9:16 vertical composition, bold subject read, clear story-frame energy", caption: "slideshow" },
+  x_twitter_image: { label: "X/Twitter image", format: "wide 16:9 or 3:2 crop, readable thumbnail, sharp central subject", caption: "timeline" },
+  pinterest_pin: { label: "Pinterest pin", format: "2:3 vertical crop, aspirational detail, save-worthy lifestyle framing", caption: "pin" },
+  album_cover: { label: "album cover", format: "square 1:1 crop, iconic central image, negative space for title placement", caption: "cover" }
 };
 
 const models = {
-  midjourney: {
-    label: "Midjourney",
-    instruction: "Use compact visual phrases, strong photographic tags, and clear aspect-ratio guidance.",
-    suffix: "--style raw --v 6"
+  midjourney: { label: "Midjourney", instruction: "Use compact visual phrases, strong photographic tags, and clear aspect-ratio guidance.", suffix: "--style raw --v 6" },
+  chatgpt_image: { label: "ChatGPT image generation", instruction: "Use natural-language direction with explicit realism, identity, camera, and composition constraints.", suffix: "" },
+  stable_diffusion_flux: { label: "Stable Diffusion / Flux", instruction: "Use weighted detail-friendly phrasing, concrete camera terms, and keep negatives separate.", suffix: "high detail, natural skin texture, realistic photography" }
+};
+
+const quickPresets = {
+  lonely_night_walk: {
+    subject: "back-facing candid photo of a lone person in a dark oversized coat",
+    aesthetic: "cinematic_lonely",
+    camera: "sony_a7siii_35mm",
+    lighting: "neon_night",
+    pose: "walking_frame",
+    location: "empty neon walkway after rain",
+    mood: "distant, cinematic, and emotionally quiet",
+    strengths: [9, 9, 9, 2, 10, 8]
   },
-  chatgpt_image: {
-    label: "ChatGPT image generation",
-    instruction: "Use natural-language direction with explicit realism, identity, camera, and composition constraints.",
-    suffix: ""
+  underground_flash: {
+    subject: "back-facing candid photo of a person leaving an underground club",
+    aesthetic: "nightlife_flash",
+    camera: "contax_t2",
+    lighting: "direct_flash",
+    pose: "candid_glance",
+    location: "basement venue stairwell with stickers and concrete walls",
+    mood: "raw, loud, and private",
+    strengths: [8, 10, 8, 1, 8, 9]
   },
-  stable_diffusion_flux: {
-    label: "Stable Diffusion / Flux",
-    instruction: "Use weighted detail-friendly phrasing, concrete camera terms, and keep negatives separate.",
-    suffix: "high detail, natural skin texture, realistic photography"
+  chrome_hearts_fit: {
+    subject: "back-facing candid photo of a person wearing a Chrome Hearts shirt",
+    aesthetic: "nightlife_flash",
+    camera: "ricoh_gr_iii",
+    lighting: "neon_night",
+    pose: "candid_glance",
+    location: "neon night walkway outside a packed club",
+    mood: "confident, anonymous, and cinematic",
+    strengths: [8, 9, 8, 4, 8, 8]
+  },
+  detached_editorial: {
+    subject: "detached fashion portrait of a person in black designer layers",
+    aesthetic: "fashion_editorial",
+    camera: "canon_r5_50mm",
+    lighting: "studio_editorial",
+    pose: "editorial_profile",
+    location: "minimal concrete studio with one practical light",
+    mood: "reserved, expensive, and emotionally distant",
+    strengths: [9, 3, 7, 9, 9, 4]
+  },
+  candid_city_walk: {
+    subject: "candid street photo of a person walking away in layered streetwear",
+    aesthetic: "downtown_model_off_duty",
+    camera: "fuji_x100v",
+    lighting: "overcast_soft",
+    pose: "walking_frame",
+    location: "downtown sidewalk with traffic blur and storefront reflections",
+    mood: "unbothered, fast, and cool",
+    strengths: [8, 10, 5, 5, 6, 7]
   }
 };
 
 const negativePrompt = "AI-looking image, plastic skin, waxy face, over-smoothed texture, fake pores, missing pores, airbrushed face, rubber skin, distorted hands, extra fingers, missing fingers, fused fingers, broken anatomy, uneven eyes, warped face, uncanny smile, glassy eyes, crossed eyes, duplicate person, identity drift, bad teeth, melted clothing, impossible fabric folds, broken jewelry, fake logo, unreadable text, misspelled text, warped background signs, impossible shadows, mismatched reflections, over-sharpened details, oversaturated colors, harsh HDR, fantasy render, cartoon, anime, 3D render, CGI, doll-like face, overly perfect symmetry, beauty-filter face, blurry subject, noisy face, low-resolution image, watermark, signature, frame, border.";
+const storageKey = "prompt-engine-web-runs";
+const favoritesKey = "prompt-engine-web-favorites";
 
 const elements = {
   form: document.querySelector("#promptForm"),
@@ -199,6 +204,14 @@ const elements = {
   mood: document.querySelector("#mood"),
   platform: document.querySelector("#platform"),
   model: document.querySelector("#model"),
+  strengths: {
+    realism: document.querySelector("#realismStrength"),
+    candidness: document.querySelector("#candidnessStrength"),
+    darkness: document.querySelector("#darknessStrength"),
+    luxury: document.querySelector("#luxuryStrength"),
+    distance: document.querySelector("#distanceStrength"),
+    imperfection: document.querySelector("#imperfectionStrength")
+  },
   universalPrompt: document.querySelector("#universalPrompt"),
   modelPrompt: document.querySelector("#modelPrompt"),
   negativePrompt: document.querySelector("#negativePrompt"),
@@ -206,10 +219,19 @@ const elements = {
   promptDna: document.querySelector("#promptDna"),
   variations: document.querySelector("#variations"),
   captions: document.querySelector("#captions"),
-  status: document.querySelector("#status")
+  status: document.querySelector("#status"),
+  toast: document.querySelector("#toast"),
+  recentRuns: document.querySelector("#recentRuns"),
+  previewAesthetic: document.querySelector("#previewAesthetic"),
+  previewSubject: document.querySelector("#previewSubject"),
+  previewMeta: document.querySelector("#previewMeta"),
+  previewMood: document.querySelector("#previewMood"),
+  previewPlatform: document.querySelector("#previewPlatform"),
+  generateButton: document.querySelector("#generateButton")
 };
 
 let latestOutput = "";
+let latestParts = null;
 
 function labelFor(key) {
   return key.replaceAll("_", " ");
@@ -236,16 +258,28 @@ function readInput() {
     location: elements.location.value.trim() || "neon night walkway outside a packed club",
     mood: elements.mood.value.trim() || "confident, anonymous, and cinematic",
     platformKey: elements.platform.value,
-    modelKey: elements.model.value
+    modelKey: elements.model.value,
+    strengths: Object.fromEntries(Object.entries(elements.strengths).map(([key, input]) => [key, Number(input.value)]))
   };
+}
+
+function strengthWording(strengths) {
+  const words = [];
+  if (strengths.realism >= 7) words.push("documentary-grade realism, preserved pores, natural facial asymmetry, real lens behavior");
+  if (strengths.candidness >= 7) words.push("snapshot realism, unposed timing, casual body language, reduced editorial stiffness");
+  if (strengths.darkness >= 7) words.push("underexposed edges, deep shadows, night contrast, practical light falloff");
+  if (strengths.luxury >= 7) words.push("quiet luxury restraint, premium fabric texture, expensive simplicity");
+  if (strengths.distance >= 7) words.push("emotionally distant posture, anonymous presence, face partially withheld");
+  if (strengths.imperfection >= 7) words.push("motion blur, analog noise, imperfect framing, slight underexposure, real-world messiness");
+  if (!words.length) words.push("balanced realism with clean social-media composition");
+  return words.join("; ");
 }
 
 function buildUniversalPrompt(input) {
   const aesthetic = aesthetics[input.aestheticKey];
   const camera = cameras[input.cameraKey];
   const platform = platforms[input.platformKey];
-
-  return `Hyper-realistic photograph of ${input.subject} in ${input.location}. Platform: ${platform.label}; compose as ${platform.format}. Aesthetic: ${labelFor(input.aestheticKey)}. Mood: ${input.mood}. ${aesthetic.description} Scene details: ${aesthetic.details.join(", ")}. Lighting: ${lighting[input.lightingKey]}; also preserve ${aesthetic.lighting}. Camera: ${camera.label}; ${camera.look}. Pose and expression: ${poses[input.poseKey]}, lived-in body language, no stiff model posing. Realism requirements: ${aesthetic.realism_notes.join(", ")}, natural pores, tiny skin imperfections, realistic facial asymmetry, grounded wardrobe texture, accurate hands, believable lens distortion, subtle background messiness, authentic social-media framing, not over-edited, not AI-looking.`;
+  return `Hyper-realistic photograph of ${input.subject} in ${input.location}. Platform: ${platform.label}; compose as ${platform.format}. Aesthetic: ${labelFor(input.aestheticKey)}. Mood: ${input.mood}. ${aesthetic.description} Scene details: ${aesthetic.details.join(", ")}. Lighting: ${lighting[input.lightingKey]}; also preserve ${aesthetic.lighting}. Camera: ${camera.label}; ${camera.look}. Pose and expression: ${poses[input.poseKey]}, lived-in body language, no stiff model posing. Creative direction strength: ${strengthWording(input.strengths)}. Realism requirements: ${aesthetic.realism_notes.join(", ")}, natural pores, tiny skin imperfections, realistic facial asymmetry, grounded wardrobe texture, accurate hands, believable lens distortion, subtle background messiness, authentic social-media framing, not over-edited, not AI-looking.`;
 }
 
 function buildModelPrompt(universalPrompt, input) {
@@ -260,7 +294,7 @@ function buildIdentityLock(subject) {
     `Keep the same core subject: ${subject}.`,
     "Preserve face shape, apparent age range, body type, skin tone, hair length, and hair color.",
     "Preserve the back-facing candid angle unless deliberately changed.",
-    "Preserve the Chrome Hearts shirt as the wardrobe anchor.",
+    "Preserve the Chrome Hearts shirt as the wardrobe anchor when present.",
     "Do not add extra people unless requested.",
     "Do not glamorize so much that the person becomes a different identity."
   ];
@@ -270,22 +304,25 @@ function buildPromptDna(input) {
   const aesthetic = aesthetics[input.aestheticKey];
   const camera = cameras[input.cameraKey];
   return [
-    `Realism style: ${aesthetic.realism_notes.join(", ")}`,
+    `Realism style: ${aesthetic.realism_notes.join(", ")}; strength ${input.strengths.realism}/10`,
     `Camera language: ${camera.label}: ${camera.look}`,
     `Composition language: ${platforms[input.platformKey].format}`,
-    `Aesthetic intensity: medium-strong ${labelFor(input.aestheticKey)} with grounded detail`,
-    `Lighting behavior: ${lighting[input.lightingKey]}`,
-    `Emotional tone: ${input.mood}`
+    `Aesthetic intensity: ${input.strengths.luxury >= 7 ? "luxury-forward" : "grounded"} ${labelFor(input.aestheticKey)}`,
+    `Lighting behavior: ${lighting[input.lightingKey]}; darkness ${input.strengths.darkness}/10`,
+    `Emotional tone: ${input.mood}; distance ${input.strengths.distance}/10`,
+    `Imperfection layer: ${input.strengths.imperfection}/10`
   ];
 }
 
 function buildVariations(input) {
   const aesthetic = aesthetics[input.aestheticKey];
   const platform = platforms[input.platformKey];
+  const candid = input.strengths.candidness >= 7 ? "more accidental timing, less posed energy" : "controlled but natural timing";
+  const imperfect = input.strengths.imperfection >= 7 ? "motion blur, analog noise, underexposed edges, imperfect crop" : "clean detail with subtle imperfections";
   return [
-    `Candid variant: ${input.subject} in ${input.location}, ${input.mood}, ${poses[input.poseKey]}, ${lighting[input.lightingKey]}, imperfect crop, slight motion, real skin texture, ${platform.format}.`,
-    `Editorial variant: ${input.subject} in ${input.location}, ${aesthetic.lighting}, stronger wardrobe shape, visible shirt texture, intentional negative space, premium but realistic color grade, ${platform.format}.`,
-    `Close atmosphere variant: ${input.subject}, tighter environmental frame, ${lighting[input.lightingKey]}, realistic fabric detail, readable neon walkway background, identity locked, non-AI-looking.`
+    `Candid variant: ${input.subject} in ${input.location}, ${input.mood}, ${poses[input.poseKey]}, ${lighting[input.lightingKey]}, ${candid}, ${imperfect}, ${platform.format}.`,
+    `Atmosphere variant: ${input.subject} in ${input.location}, ${aesthetic.lighting}, environmental reflections, background texture, practical shadows, visible wardrobe detail, ${platform.format}.`,
+    `Detached variant: ${input.subject}, emotionally distant posture, face partially withheld, ${lighting[input.lightingKey]}, realistic fabric detail, identity locked, non-AI-looking.`
   ];
 }
 
@@ -300,7 +337,7 @@ function buildCaptions(input) {
   ];
 }
 
-function renderList(target, items, ordered = false) {
+function renderList(target, items) {
   target.innerHTML = "";
   items.forEach((item) => {
     const li = document.createElement("li");
@@ -336,42 +373,62 @@ function buildFullOutput(parts) {
   ].join("\n");
 }
 
-function generatePrompt() {
+function updatePreview(input) {
+  elements.previewAesthetic.textContent = input.aestheticKey;
+  elements.previewSubject.textContent = input.subject;
+  elements.previewMeta.textContent = `${cameras[input.cameraKey].label} / ${input.location}`;
+  elements.previewMood.textContent = input.mood;
+  elements.previewPlatform.textContent = platforms[input.platformKey].label;
+}
+
+function setGenerating(isGenerating) {
+  elements.generateButton.classList.toggle("generating", isGenerating);
+  elements.generateButton.textContent = isGenerating ? "Generating" : "Generate Prompt";
+}
+
+function generatePrompt(saveRun = false) {
   const input = readInput();
-  const universalPrompt = buildUniversalPrompt(input);
-  const modelPrompt = buildModelPrompt(universalPrompt, input);
-  const identityLock = buildIdentityLock(input.subject);
-  const promptDna = buildPromptDna(input);
-  const variations = buildVariations(input);
-  const captions = buildCaptions(input);
+  updatePreview(input);
+  setGenerating(true);
+  setStatus("Generating");
 
-  elements.universalPrompt.textContent = universalPrompt;
-  elements.modelPrompt.textContent = modelPrompt;
-  elements.negativePrompt.textContent = negativePrompt;
-  renderList(elements.identityLock, identityLock);
-  renderList(elements.promptDna, promptDna);
-  renderList(elements.variations, variations, true);
-  renderList(elements.captions, captions);
+  window.setTimeout(() => {
+    const universalPrompt = buildUniversalPrompt(input);
+    const modelPrompt = buildModelPrompt(universalPrompt, input);
+    const identityLock = buildIdentityLock(input.subject);
+    const promptDna = buildPromptDna(input);
+    const variations = buildVariations(input);
+    const captions = buildCaptions(input);
 
-  latestOutput = buildFullOutput({
-    universalPrompt,
-    modelPrompt,
-    negativePrompt,
-    identityLock,
-    promptDna,
-    variations,
-    captions
-  });
-  setStatus("Generated");
+    elements.universalPrompt.textContent = universalPrompt;
+    elements.modelPrompt.textContent = modelPrompt;
+    elements.negativePrompt.textContent = negativePrompt;
+    renderList(elements.identityLock, identityLock);
+    renderList(elements.promptDna, promptDna);
+    renderList(elements.variations, variations);
+    renderList(elements.captions, captions);
+
+    latestParts = { input, universalPrompt, modelPrompt, negativePrompt, identityLock, promptDna, variations, captions };
+    latestOutput = buildFullOutput(latestParts);
+    setGenerating(false);
+    setStatus("Generated");
+    if (saveRun) saveCurrentPrompt(false);
+  }, 260);
 }
 
 function setStatus(text) {
   elements.status.textContent = text;
 }
 
+function showToast(message) {
+  elements.toast.textContent = message;
+  elements.toast.classList.add("show");
+  window.setTimeout(() => elements.toast.classList.remove("show"), 1600);
+}
+
 async function copyText(text, label) {
   if (!text) {
-    setStatus("Nothing to copy");
+    showToast("Nothing to copy");
     return;
   }
   try {
@@ -387,9 +444,9 @@ async function copyText(text, label) {
       document.execCommand("copy");
       helper.remove();
     }
-    setStatus(`${label} copied`);
+    showToast(`${label} copied`);
   } catch (error) {
-    setStatus("Copy blocked");
+    showToast("Copy blocked by browser");
   }
 }
 
@@ -398,11 +455,34 @@ function randomKey(data) {
   return keys[Math.floor(Math.random() * keys.length)];
 }
 
+function setStrengths(values) {
+  const keys = ["realism", "candidness", "darkness", "luxury", "distance", "imperfection"];
+  keys.forEach((key, index) => {
+    elements.strengths[key].value = values[index];
+  });
+}
+
+function applyPreset(name) {
+  const preset = quickPresets[name];
+  elements.subject.value = preset.subject;
+  elements.aesthetic.value = preset.aesthetic;
+  elements.camera.value = preset.camera;
+  elements.lighting.value = preset.lighting;
+  elements.pose.value = preset.pose;
+  elements.location.value = preset.location;
+  elements.mood.value = preset.mood;
+  setStrengths(preset.strengths);
+  generatePrompt();
+}
+
 function randomize() {
   elements.aesthetic.value = randomKey(aesthetics);
   elements.camera.value = randomKey(cameras);
   elements.lighting.value = randomKey(lighting);
   elements.pose.value = randomKey(poses);
+  Object.values(elements.strengths).forEach((input) => {
+    input.value = Math.floor(Math.random() * 5) + 5;
+  });
   generatePrompt();
 }
 
@@ -412,6 +492,55 @@ function clearForm() {
   elements.mood.value = "";
   generatePrompt();
   setStatus("Cleared");
+}
+
+function loadJson(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key)) || [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveJson(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+function saveCurrentPrompt(favorite) {
+  if (!latestParts) return;
+  const run = {
+    id: Date.now().toString(36),
+    favorite,
+    createdAt: new Date().toLocaleString(),
+    title: latestParts.input.subject,
+    aesthetic: latestParts.input.aestheticKey,
+    camera: latestParts.input.cameraKey,
+    output: latestOutput
+  };
+  const runs = [run, ...loadJson(storageKey)].slice(0, 12);
+  saveJson(storageKey, runs);
+  if (favorite) saveJson(favoritesKey, [run, ...loadJson(favoritesKey)].slice(0, 12));
+  renderRecentRuns();
+  showToast(favorite ? "Favorited" : "Saved");
+}
+
+function renderRecentRuns() {
+  const runs = loadJson(storageKey);
+  elements.recentRuns.innerHTML = "";
+  if (!runs.length) {
+    const empty = document.createElement("p");
+    empty.className = "recent-empty";
+    empty.textContent = "Saved prompts appear here.";
+    elements.recentRuns.appendChild(empty);
+    return;
+  }
+  runs.forEach((run) => {
+    const item = document.createElement("article");
+    item.className = "recent-item";
+    item.innerHTML = `<strong>${run.aesthetic}</strong><small>${run.camera}</small><small>${run.createdAt}</small>`;
+    item.addEventListener("click", () => copyText(run.output, "Saved prompt"));
+    elements.recentRuns.appendChild(item);
+  });
 }
 
 function init() {
@@ -424,10 +553,36 @@ function init() {
 
   elements.form.addEventListener("submit", (event) => {
     event.preventDefault();
-    generatePrompt();
+    generatePrompt(true);
   });
   document.querySelector("#randomize").addEventListener("click", randomize);
   document.querySelector("#clear").addEventListener("click", clearForm);
+  document.querySelector("#savePrompt").addEventListener("click", () => saveCurrentPrompt(false));
+  document.querySelector("#favoritePrompt").addEventListener("click", () => saveCurrentPrompt(true));
+  document.querySelector("#clearRuns").addEventListener("click", () => {
+    saveJson(storageKey, []);
+    renderRecentRuns();
+    showToast("Recent runs cleared");
+  });
+  document.querySelectorAll("[data-preset]").forEach((button) => {
+    button.addEventListener("click", () => applyPreset(button.dataset.preset));
+  });
+  Object.values(elements.strengths).forEach((input) => {
+    input.addEventListener("input", () => generatePrompt());
+  });
+  [
+    elements.subject,
+    elements.location,
+    elements.mood,
+    elements.aesthetic,
+    elements.camera,
+    elements.lighting,
+    elements.pose,
+    elements.platform,
+    elements.model
+  ].forEach((input) => {
+    input.addEventListener("change", () => generatePrompt());
+  });
   document.querySelectorAll("[data-copy]").forEach((button) => {
     button.addEventListener("click", () => {
       const target = button.dataset.copy;
@@ -440,6 +595,7 @@ function init() {
     });
   });
 
+  renderRecentRuns();
   generatePrompt();
 }
 

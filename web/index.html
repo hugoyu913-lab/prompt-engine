@@ -3,74 +3,141 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Prompt Engine</title>
+    <title>Prompt Engine Studio</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <div class="grain"></div>
     <main class="app-shell">
       <header class="topbar">
         <div>
-          <p class="eyebrow">Prompt Engine</p>
-          <h1>Aesthetic Image Prompt Studio</h1>
+          <p class="eyebrow">Prompt Engine Studio</p>
+          <h1>Cinematic aesthetic direction console</h1>
         </div>
-        <div class="status-pill" id="status">Ready</div>
+        <div class="top-actions">
+          <div class="status-pill" id="status">Ready</div>
+          <button type="button" id="savePrompt">Save Prompt</button>
+          <button type="button" id="favoritePrompt">Favorite Prompt</button>
+        </div>
       </header>
 
-      <section class="workspace">
-        <form class="control-panel" id="promptForm">
-          <div class="field span-2">
-            <label for="subject">Subject</label>
-            <textarea id="subject" rows="3">back-facing candid photo of a person wearing a Chrome Hearts shirt</textarea>
+      <section class="studio-grid">
+        <aside class="left-rail glass-panel">
+          <div class="panel-header">
+            <p class="eyebrow">Recent Runs</p>
+            <button type="button" class="mini-button" id="clearRuns">Clear</button>
           </div>
+          <div class="recent-list" id="recentRuns"></div>
+        </aside>
 
-          <div class="field">
-            <label for="aesthetic">Aesthetic</label>
-            <select id="aesthetic"></select>
-          </div>
+        <section class="center-stack">
+          <section class="preview-card">
+            <div class="preview-image" id="previewImage">
+              <div class="preview-noise"></div>
+              <div class="preview-copy">
+                <span id="previewAesthetic">nightlife_flash</span>
+                <strong id="previewSubject">Chrome Hearts night walk</strong>
+                <small id="previewMeta">Ricoh GR III / neon night walkway</small>
+              </div>
+            </div>
+            <div class="preview-footer">
+              <span id="previewMood">confident, anonymous, cinematic</span>
+              <span id="previewPlatform">Instagram vertical post</span>
+            </div>
+          </section>
 
-          <div class="field">
-            <label for="camera">Camera</label>
-            <select id="camera"></select>
-          </div>
+          <form class="control-panel glass-panel" id="promptForm">
+            <div class="quick-presets span-2">
+              <div class="panel-header">
+                <p class="eyebrow">Quick Presets</p>
+              </div>
+              <div class="preset-row">
+                <button type="button" data-preset="lonely_night_walk">lonely_night_walk</button>
+                <button type="button" data-preset="underground_flash">underground_flash</button>
+                <button type="button" data-preset="chrome_hearts_fit">chrome_hearts_fit</button>
+                <button type="button" data-preset="detached_editorial">detached_editorial</button>
+                <button type="button" data-preset="candid_city_walk">candid_city_walk</button>
+              </div>
+            </div>
 
-          <div class="field">
-            <label for="lighting">Lighting</label>
-            <select id="lighting"></select>
-          </div>
+            <div class="field span-2">
+              <label for="subject">Subject</label>
+              <textarea id="subject" rows="3">back-facing candid photo of a person wearing a Chrome Hearts shirt</textarea>
+            </div>
 
-          <div class="field">
-            <label for="pose">Pose</label>
-            <select id="pose"></select>
-          </div>
+            <div class="field">
+              <label for="aesthetic">Aesthetic</label>
+              <select id="aesthetic"></select>
+            </div>
 
-          <div class="field span-2">
-            <label for="location">Location</label>
-            <input id="location" value="neon night walkway outside a packed club">
-          </div>
+            <div class="field">
+              <label for="camera">Camera</label>
+              <select id="camera"></select>
+            </div>
 
-          <div class="field">
-            <label for="mood">Mood</label>
-            <input id="mood" value="confident, anonymous, and cinematic">
-          </div>
+            <div class="field">
+              <label for="lighting">Lighting</label>
+              <select id="lighting"></select>
+            </div>
 
-          <div class="field">
-            <label for="platform">Platform</label>
-            <select id="platform"></select>
-          </div>
+            <div class="field">
+              <label for="pose">Pose</label>
+              <select id="pose"></select>
+            </div>
 
-          <div class="field">
-            <label for="model">Model profile</label>
-            <select id="model"></select>
-          </div>
+            <div class="field span-2">
+              <label for="location">Location</label>
+              <input id="location" value="neon night walkway outside a packed club">
+            </div>
 
-          <div class="button-row span-2">
-            <button type="submit" class="primary">Generate Prompt</button>
-            <button type="button" id="randomize">Randomize</button>
-            <button type="button" id="clear">Clear</button>
-          </div>
-        </form>
+            <div class="field">
+              <label for="mood">Mood</label>
+              <input id="mood" value="confident, anonymous, and cinematic">
+            </div>
 
-        <aside class="output-panel">
+            <div class="field">
+              <label for="platform">Platform</label>
+              <select id="platform"></select>
+            </div>
+
+            <div class="field">
+              <label for="model">Model profile</label>
+              <select id="model"></select>
+            </div>
+
+            <div class="strength-grid span-2">
+              <div class="panel-header">
+                <p class="eyebrow">Prompt Strength</p>
+              </div>
+              <label>Realism <input type="range" min="0" max="10" value="8" id="realismStrength"></label>
+              <label>Candidness <input type="range" min="0" max="10" value="9" id="candidnessStrength"></label>
+              <label>Darkness <input type="range" min="0" max="10" value="8" id="darknessStrength"></label>
+              <label>Luxury <input type="range" min="0" max="10" value="4" id="luxuryStrength"></label>
+              <label>Emotional distance <input type="range" min="0" max="10" value="8" id="distanceStrength"></label>
+              <label>Imperfection <input type="range" min="0" max="10" value="8" id="imperfectionStrength"></label>
+            </div>
+
+            <div class="button-row span-2">
+              <button type="submit" class="primary" id="generateButton">Generate Prompt</button>
+              <button type="button" id="randomize">Randomize</button>
+              <button type="button" id="clear">Clear</button>
+            </div>
+          </form>
+
+          <section class="moodboard glass-panel">
+            <div class="panel-header">
+              <p class="eyebrow">Aesthetic Moodboard</p>
+            </div>
+            <div class="moodboard-grid">
+              <article><span></span><strong>Flash shadow</strong><small>Hard edge, glossy skin, crowded doorway.</small></article>
+              <article><span></span><strong>Neon walkway</strong><small>Wet pavement, colored spill, unreadable signs.</small></article>
+              <article><span></span><strong>Back-facing fit</strong><small>Logo anchor, anonymous posture, candid distance.</small></article>
+              <article><span></span><strong>Analog noise</strong><small>Underexposed corners, motion drag, imperfect crop.</small></article>
+            </div>
+          </section>
+        </section>
+
+        <aside class="output-panel glass-panel">
           <div class="output-actions">
             <button type="button" data-copy="modelPrompt">Copy Model-Specific Prompt</button>
             <button type="button" data-copy="negativePrompt">Copy Negative Prompt</button>
@@ -78,45 +145,45 @@
           </div>
 
           <div class="output-stack" id="output">
-            <section class="output-section">
-              <h2>Universal Prompt</h2>
+            <details class="output-section" open>
+              <summary>Universal Prompt</summary>
               <p id="universalPrompt"></p>
-            </section>
+            </details>
 
-            <section class="output-section">
-              <h2>Model-Specific Prompt</h2>
+            <details class="output-section" open>
+              <summary>Model-Specific Prompt</summary>
               <p id="modelPrompt"></p>
-            </section>
+            </details>
 
-            <section class="output-section">
-              <h2>Negative Prompt</h2>
+            <details class="output-section">
+              <summary>Negative Prompt</summary>
               <p id="negativePrompt"></p>
-            </section>
+            </details>
 
-            <section class="output-section">
-              <h2>Identity Lock</h2>
+            <details class="output-section">
+              <summary>Identity Lock</summary>
               <ul id="identityLock"></ul>
-            </section>
+            </details>
 
-            <section class="output-section">
-              <h2>Prompt DNA</h2>
+            <details class="output-section" open>
+              <summary>Prompt DNA</summary>
               <ul id="promptDna"></ul>
-            </section>
+            </details>
 
-            <section class="output-section">
-              <h2>Variations</h2>
+            <details class="output-section">
+              <summary>Variations</summary>
               <ol id="variations"></ol>
-            </section>
+            </details>
 
-            <section class="output-section">
-              <h2>Captions</h2>
+            <details class="output-section">
+              <summary>Captions</summary>
               <ul id="captions"></ul>
-            </section>
+            </details>
           </div>
         </aside>
       </section>
     </main>
-
+    <div class="toast" id="toast">Copied</div>
     <script src="app.js"></script>
   </body>
 </html>
