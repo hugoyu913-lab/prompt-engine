@@ -271,6 +271,17 @@
         </aside>
       </section>
     </main>
+    <div class="sticky-action-bar" aria-label="Prompt actions">
+      <div class="sticky-action-copy">
+        <span class="ready-dot"></span>
+        <span>Ready to generate</span>
+      </div>
+      <div class="sticky-action-buttons">
+        <button type="submit" form="promptForm" class="primary sticky-generate" id="stickyGenerateButton">Generate Prompt</button>
+        <button type="button" data-copy="cleanPrompt">Copy Clean Prompt</button>
+        <button type="button" data-copy="cleanNegativePrompt">Copy Clean Negative Prompt</button>
+      </div>
+    </div>
     <div class="toast" id="toast">Copied</div>
     <script src="app.js"></script>
   </body>

@@ -274,7 +274,8 @@ const elements = {
   previewMeta: document.querySelector("#previewMeta"),
   previewMood: document.querySelector("#previewMood"),
   previewPlatform: document.querySelector("#previewPlatform"),
-  generateButton: document.querySelector("#generateButton")
+  generateButton: document.querySelector("#generateButton"),
+  stickyGenerateButton: document.querySelector("#stickyGenerateButton")
 };
 
 let latestOutput = "";
@@ -526,8 +527,11 @@ function updatePreview(input) {
 }
 
 function setGenerating(isGenerating) {
-  elements.generateButton.classList.toggle("generating", isGenerating);
-  elements.generateButton.textContent = isGenerating ? "Generating" : "Generate Prompt";
+  [elements.generateButton, elements.stickyGenerateButton].forEach((button) => {
+    if (!button) return;
+    button.classList.toggle("generating", isGenerating);
+    button.textContent = isGenerating ? "Generating" : "Generate Prompt";
+  });
 }
 
 function generatePrompt(saveRun = false) {

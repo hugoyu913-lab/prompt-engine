@@ -22,6 +22,7 @@
 body {
   margin: 0;
   min-height: 100vh;
+  padding-bottom: 98px;
   background:
     radial-gradient(circle at 22% 0%, rgba(201, 168, 103, 0.12), transparent 34vw),
     radial-gradient(circle at 90% 10%, rgba(138, 167, 184, 0.1), transparent 30vw),
@@ -287,6 +288,60 @@ button.primary {
   font-weight: 800;
 }
 
+.sticky-action-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  z-index: 9;
+  width: min(960px, calc(100% - 28px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px;
+  border: 1px solid rgba(201, 168, 103, 0.28);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(28, 29, 34, 0.88), rgba(10, 11, 14, 0.94)),
+    rgba(8, 9, 11, 0.9);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(24px);
+  transform: translateX(-50%);
+}
+
+.sticky-action-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--soft);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ready-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 18px rgba(201, 168, 103, 0.72);
+}
+
+.sticky-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sticky-generate {
+  min-width: 188px;
+  padding: 14px 20px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 12px 34px rgba(201, 168, 103, 0.24);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .mini-button {
   padding: 7px 10px;
   font-size: 12px;
@@ -531,6 +586,10 @@ ol {
 }
 
 @media (max-width: 620px) {
+  body {
+    padding-bottom: 170px;
+  }
+
   .app-shell {
     width: min(100% - 20px, 1720px);
     padding-top: 14px;
@@ -555,5 +614,24 @@ ol {
 
   .preview-image {
     min-height: 300px;
+  }
+
+  .sticky-action-bar,
+  .sticky-action-buttons {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .sticky-action-bar {
+    bottom: 10px;
+    gap: 10px;
+  }
+
+  .sticky-action-copy {
+    justify-content: center;
+  }
+
+  .sticky-generate {
+    min-width: 0;
   }
 }
