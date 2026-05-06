@@ -367,11 +367,21 @@ function buildUniversalPrompt(input) {
   const platform = platforms[input.platformKey];
   const qualityMode = qualityModes[input.qualityModeKey];
   const cleanSubject = cleanSubjectPhrase(input.subject);
+
+  const garmentDesc = input.garment.enabled
+    ? [input.garment.fit, input.garment.color, input.garment.brand, input.garment.type]
+        .filter(Boolean).join(" ")
+    : "";
+
   const subjectIntro = input.subject.toLowerCase().includes("back-facing")
     ? `Back-facing candid late-night photo of ${cleanSubject}`
     : `Hyper-realistic photo of ${cleanSubject}`;
-  const garmentDirection = input.garment.enabled ? ` Garment accuracy overrides aesthetic styling. ${buildGarmentAccuracyText(input.garment)}` : "";
-  return `${subjectIntro} at ${input.location}. ${platform.format}. ${labelFor(input.aestheticKey)} mood: ${input.mood}. ${aesthetic.description} Details: ${aesthetic.details.join(", ")}. Camera: ${camera.label}; ${camera.look}. Lighting: ${lighting[input.lightingKey]}; ${aesthetic.lighting}. Composition: ${poses[input.poseKey]}, ${qualityMode.direction}. Direction: ${strengthWording(input.strengths)}. Realism: ${aesthetic.realism_notes.join(", ")}, natural pores, accurate hands, believable lens distortion, real fabric texture, subtle background mess, not over-edited, not AI-looking.${garmentDirection}`;
+  const wearingClause = garmentDesc ? ` Wearing: ${garmentDesc}.` : "";
+  const garmentDirection = input.garment.enabled
+    ? ` Garment accuracy overrides aesthetic styling. ${buildGarmentAccuracyText(input.garment)}`
+    : "";
+
+  return `${subjectIntro}${wearingClause} at ${input.location}. ${platform.format}. ${labelFor(input.aestheticKey)} mood: ${input.mood}. ${aesthetic.description} Details: ${aesthetic.details.join(", ")}. Camera: ${camera.label}; ${camera.look}. Lighting: ${lighting[input.lightingKey]}; ${aesthetic.lighting}. Composition: ${poses[input.poseKey]}, ${qualityMode.direction}. Direction: ${strengthWording(input.strengths)}. Realism: ${aesthetic.realism_notes.join(", ")}, natural pores, accurate hands, believable lens distortion, real fabric texture, subtle background mess, not over-edited, not AI-looking.${garmentDirection}`;
 }
 
 function buildGarmentAccuracyText(garment) {
@@ -411,12 +421,25 @@ function buildCleanPrompt(modelPrompt) {
 }
 
 function buildIdentityLock(subject) {
+  const g = readGarmentInput();
+  const garmentRef = g.enabled && (g.brand || g.type)
+    ? [g.brand, g.type].filter(Boolean).join(" ")
+    : "the garment";
+  const fitColorRef = g.enabled
+    ? [g.fit, g.color].filter(Boolean).join(", ")
+    : "";
+  const backRef = g.enabled && g.backDesign
+    ? g.backDesign
+    : "back graphic design";
+  const garmentLock = g.enabled
+    ? `For ${garmentRef} prompts: preserve ${fitColorRef ? fitColorRef + " fit, " : ""}exact garment structure, ${backRef}, and candid posture.`
+    : "Preserve the garment structure and any visible graphics.";
   return [
     `Keep the same core subject: ${subject}.`,
     "Preserve face shape, apparent age range, body type, skin tone, hair length, and hair color.",
     "Preserve the back-facing candid angle unless deliberately changed.",
-    "For Chrome Hearts back-facing prompts: keep the large cross graphic centered on the shirt back, fitted hat, oversized black shirt, loose grey pants, candid walking posture, and neon night setting.",
-    "Do not warp shirt-back graphics, cross designs, fitted hat, oversized shirt silhouette, or loose pants.",
+    garmentLock,
+    "Do not warp garment graphics, logo placement, or silhouette.",
     "Do not add extra people unless requested.",
     "Do not glamorize so much that the person becomes a different identity."
   ];
@@ -445,7 +468,7 @@ function buildVariations(input) {
   const imperfect = input.strengths.imperfection >= 7 ? "motion blur, analog noise, underexposed edges, imperfect crop" : "clean detail with subtle imperfections";
   return [
     `Candid variant: ${cleanSubject} at ${input.location}, ${poses[input.poseKey]}, ${candid}, ${imperfect}, ${platform.format}.`,
-    `Outfit variant: ${cleanSubject}, readable clothing shape, fabric texture, shirt graphics intact, ${aesthetic.lighting}, ${platform.format}.`,
+    `Outfit variant: ${cleanSubject}, readable clothing shape, fabric texture, ${input.garment.enabled && input.garment.type ? input.garment.type + " graphics intact" : "garment graphics intact"}, ${aesthetic.lighting}, ${platform.format}.`,
     `Mode variant: ${qualityModes[input.qualityModeKey].direction}, same identity, ${input.location} readable, non-AI-looking.`
   ];
 }
