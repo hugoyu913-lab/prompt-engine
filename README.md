@@ -20,7 +20,8 @@ prompt-engine/
 │   └── .gitkeep
 ├── data/
 │   ├── prompt_runs.jsonl
-│   └── image_reviews.jsonl
+│   ├── image_reviews.jsonl
+│   └── learned_patterns.json
 ├── examples/
 │   └── example_outputs.md
 ├── src/
@@ -88,6 +89,30 @@ python src/generate_prompt.py --best
 ```
 
 Scores use the average of realism, aesthetic, identity, and postability.
+
+## Prompt Evolution System
+
+Analyze reviewed runs and save learned winners:
+
+```bash
+python src/generate_prompt.py --analyze
+```
+
+The analysis writes `data/learned_patterns.json` with highest scoring aesthetics, cameras, lighting setups, platforms, and common traits among strong runs.
+
+Generate a future prompt biased toward learned successful styles:
+
+```bash
+python src/generate_prompt.py --evolve
+```
+
+Create evolved variants from an existing run while preserving identity:
+
+```bash
+python src/generate_prompt.py --mutate
+```
+
+Every normal, evolved, and mutated prompt keeps a `run_id`, saves `outputs/latest_prompt.md`, and can be reviewed later.
 
 ## Platform Modes
 

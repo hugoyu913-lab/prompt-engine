@@ -44,6 +44,25 @@ AI-looking image, plastic skin, waxy face, over-smoothed texture, fake pores, mi
 - Keep facial features realistic and asymmetric, not beauty-filtered.
 - If regenerating, compare eyes, jawline, hair, hands, and wardrobe anchor first.
 
+## Prompt DNA
+
+- Realism Style: uneven street light on face, slight background blur, natural clothing folds
+- Camera Language: Fujifilm X100V: compact street photography feel, film-like color, honest detail, natural highlight rolloff, candid framing
+- Composition Language: 4:5 vertical crop, strong first-glance composition, feed-ready polish
+- Aesthetic Intensity: Medium-strong tokyo streetwear with grounded detail.
+- Lighting Behavior: neon practical lights, colored rim light, dark ambient contrast
+- Emotional Tone: confident and cinematic
+
+## Mutation Notes
+
+### What changed from the original prompt
+
+- Created baseline prompt DNA for future testing and evolution.
+
+### Why it changed
+
+Fresh generation; no parent prompt was mutated.
+
 ## Variations
 
 1. Candid variation: photographed mid-step with slight motion in the coat, uneven neon light on the face, blurred pedestrians behind, imperfect crop, real skin texture.

@@ -1,28 +1,28 @@
 # Prompt Engine Output
 
-Run ID: 12fda8a03713
+Run ID: 84be2bb67a27
 
-Generated: 2026-05-05 19:20:24
+Generated: 2026-05-05 19:25:54
 
 ## Input
 
-- Subject: a creative athlete in black training gear
-- Aesthetic: `miami_flash`
-- Location: warehouse gym with concrete walls
-- Mood: disciplined and sharp
-- Camera: `ricoh_gr_iii`
+- Subject: a DJ in a black mesh top
+- Aesthetic: `nightlife_flash`
+- Location: backstage hallway after midnight
+- Mood: confident and electric
+- Camera: `contax_t2`
 - Platform: `instagram_vertical_post` (Instagram vertical post)
-- Model profile: `chatgpt_image` (ChatGPT image generation)
+- Model profile: `midjourney` (Midjourney)
 - Lighting: `direct_flash`
 - Pose: `seated_composed`
 
 ## Universal Prompt
 
-Hyper-realistic photograph of a creative athlete in black training gear in warehouse gym with concrete walls. Platform: Instagram vertical post; compose as 4:5 vertical crop, strong first-glance composition, feed-ready polish. Aesthetic: miami flash. Mood: disciplined and sharp. Glossy coastal nightlife photography with direct flash, humid skin, colorful interiors, and vacation-party realism. Scene details: palm shadows, chrome bar detail, humid skin glow, white outfit, bright wall color. Lighting: direct on-camera flash, crisp shadows, glossy highlights, nightlife realism; also preserve direct flash over warm bar lights, reflective surfaces, and saturated but believable color. Camera: Ricoh GR III; wide candid street-photo realism, compact-camera immediacy, textured detail, slightly raw everyday perspective. Pose and expression: seated composed posture, calm hands, confident eye line, lived-in body language, no stiff model posing. Realism requirements: flash reflection on skin, slight color cast, realistic background clutter, natural pores, tiny skin imperfections, realistic facial asymmetry, grounded wardrobe texture, accurate hands, believable lens distortion, subtle background messiness, authentic social-media framing, not over-edited, not AI-looking.
+Hyper-realistic photograph of a DJ in a black mesh top in backstage hallway after midnight. Platform: Instagram vertical post; compose as 4:5 vertical crop, strong first-glance composition, feed-ready polish. Aesthetic: nightlife flash. Mood: confident and electric. Raw direct-flash nightlife photography with dark rooms, reflective skin, crowded backgrounds, and real party movement instead of polished studio posing. Scene details: club entrance, wristband, slight motion blur, glossy skin, crowded background. Lighting: direct on-camera flash, crisp shadows, glossy highlights, nightlife realism; also preserve hard on-camera flash mixed with low ambient club light, crisp face highlights, deep falloff behind the subject. Camera: Contax T2 film camera; premium point-and-shoot film look, organic grain, soft highlight rolloff, realistic flash and imperfect focus. Pose and expression: seated composed posture, calm hands, confident eye line, lived-in body language, no stiff model posing. Realism requirements: flash shadow behind jawline, slightly imperfect crop, visible skin texture, natural pores, tiny skin imperfections, realistic facial asymmetry, grounded wardrobe texture, accurate hands, believable lens distortion, subtle background messiness, authentic social-media framing, not over-edited, not AI-looking.
 
 ## Model-Specific Prompt
 
-Use natural-language direction with explicit realism, identity, camera, and composition constraints. Hyper-realistic photograph of a creative athlete in black training gear in warehouse gym with concrete walls. Platform: Instagram vertical post; compose as 4:5 vertical crop, strong first-glance composition, feed-ready polish. Aesthetic: miami flash. Mood: disciplined and sharp. Glossy coastal nightlife photography with direct flash, humid skin, colorful interiors, and vacation-party realism. Scene details: palm shadows, chrome bar detail, humid skin glow, white outfit, bright wall color. Lighting: direct on-camera flash, crisp shadows, glossy highlights, nightlife realism; also preserve direct flash over warm bar lights, reflective surfaces, and saturated but believable color. Camera: Ricoh GR III; wide candid street-photo realism, compact-camera immediacy, textured detail, slightly raw everyday perspective. Pose and expression: seated composed posture, calm hands, confident eye line, lived-in body language, no stiff model posing. Realism requirements: flash reflection on skin, slight color cast, realistic background clutter, natural pores, tiny skin imperfections, realistic facial asymmetry, grounded wardrobe texture, accurate hands, believable lens distortion, subtle background messiness, authentic social-media framing, not over-edited, not AI-looking. Prioritize believable photography, identity consistency, and 4:5 vertical crop, strong first-glance composition, feed-ready polish.
+Use compact visual phrases, strong photographic tags, and clear aspect-ratio guidance. Hyper-realistic photograph of a DJ in a black mesh top in backstage hallway after midnight. Platform: Instagram vertical post; compose as 4:5 vertical crop, strong first-glance composition, feed-ready polish. Aesthetic: nightlife flash. Mood: confident and electric. Raw direct-flash nightlife photography with dark rooms, reflective skin, crowded backgrounds, and real party movement instead of polished studio posing. Scene details: club entrance, wristband, slight motion blur, glossy skin, crowded background. Lighting: direct on-camera flash, crisp shadows, glossy highlights, nightlife realism; also preserve hard on-camera flash mixed with low ambient club light, crisp face highlights, deep falloff behind the subject. Camera: Contax T2 film camera; premium point-and-shoot film look, organic grain, soft highlight rolloff, realistic flash and imperfect focus. Pose and expression: seated composed posture, calm hands, confident eye line, lived-in body language, no stiff model posing. Realism requirements: flash shadow behind jawline, slightly imperfect crop, visible skin texture, natural pores, tiny skin imperfections, realistic facial asymmetry, grounded wardrobe texture, accurate hands, believable lens distortion, subtle background messiness, authentic social-media framing, not over-edited, not AI-looking. Prioritize believable photography, identity consistency, and 4:5 vertical crop, strong first-glance composition, feed-ready polish. --style raw --v 6
 
 ## Negative Prompt
 
@@ -32,7 +32,7 @@ AI-looking image, plastic skin, waxy face, over-smoothed texture, fake pores, mi
 
 ### Immutable face/body traits
 
-- Keep the same core subject: a creative athlete in black training gear.
+- Keep the same core subject: a DJ in a black mesh top.
 - Preserve face shape, apparent age range, body type, skin tone, hair length, and hair color.
 - Preserve key wardrobe anchors and recognizable styling details from the subject description.
 
@@ -48,17 +48,38 @@ AI-looking image, plastic skin, waxy face, over-smoothed texture, fake pores, mi
 - Keep facial features realistic and asymmetric, not beauty-filtered.
 - If regenerating, compare eyes, jawline, hair, hands, and wardrobe anchor first.
 
+## Prompt DNA
+
+- Realism Style: flash shadow behind jawline, slightly imperfect crop, visible skin texture
+- Camera Language: Contax T2 film camera: premium point-and-shoot film look, organic grain, soft highlight rolloff, realistic flash and imperfect focus
+- Composition Language: 4:5 vertical crop, strong first-glance composition, feed-ready polish
+- Aesthetic Intensity: Medium-strong nightlife flash with grounded detail.
+- Lighting Behavior: direct on-camera flash, crisp shadows, glossy highlights, nightlife realism
+- Emotional Tone: confident and electric
+
+## Mutation Notes
+
+### What changed from the original prompt
+
+- Selected historically stronger aesthetic, camera, or lighting when available.
+- Kept identity and platform requirements unchanged.
+- Used learned direction while preserving beginner-friendly prompt structure.
+
+### Why it changed
+
+This prompt uses learned pattern bias from reviewed high-scoring runs.
+
 ## 3 Variations
 
-1. Candid variation: a creative athlete in black training gear in warehouse gym with concrete walls, disciplined and sharp mood, seated composed posture, calm hands, confident eye line, direct on-camera flash, crisp shadows, glossy highlights, nightlife realism, imperfect crop, slight environmental motion, real skin texture, believable snapshot timing, 4:5 vertical crop, strong first-glance composition, feed-ready polish.
-2. Editorial variation: a creative athlete in black training gear in warehouse gym with concrete walls, direct flash over warm bar lights, reflective surfaces, and saturated but believable color, seated composed posture, calm hands, confident eye line, stronger wardrobe shape, intentional negative space, premium but realistic color grade, visible fabric texture, cinematic contrast, 4:5 vertical crop, strong first-glance composition, feed-ready polish.
-3. Close portrait variation: a creative athlete in black training gear, tighter frame, direct on-camera flash, crisp shadows, glossy highlights, nightlife realism, honest facial detail, natural pores, subtle under-eye texture, realistic catchlights, background from warehouse gym with concrete walls still readable, identity locked, non-AI-looking.
+1. Candid variation: a DJ in a black mesh top in backstage hallway after midnight, confident and electric mood, seated composed posture, calm hands, confident eye line, direct on-camera flash, crisp shadows, glossy highlights, nightlife realism, imperfect crop, slight environmental motion, real skin texture, believable snapshot timing, 4:5 vertical crop, strong first-glance composition, feed-ready polish.
+2. Editorial variation: a DJ in a black mesh top in backstage hallway after midnight, hard on-camera flash mixed with low ambient club light, crisp face highlights, deep falloff behind the subject, seated composed posture, calm hands, confident eye line, stronger wardrobe shape, intentional negative space, premium but realistic color grade, visible fabric texture, cinematic contrast, 4:5 vertical crop, strong first-glance composition, feed-ready polish.
+3. Close portrait variation: a DJ in a black mesh top, tighter frame, direct on-camera flash, crisp shadows, glossy highlights, nightlife realism, honest facial detail, natural pores, subtle under-eye texture, realistic catchlights, background from backstage hallway after midnight still readable, identity locked, non-AI-looking.
 
 ## Captions
 
-- Disciplined and sharp, but keep it effortless.
-- Miami Flash frame with real-life texture.
-- A creative athlete in black training gear energy, caught between moments.
+- Confident and electric, but keep it effortless.
+- Nightlife Flash frame with real-life texture.
+- A dj in a black mesh top energy, caught between moments.
 - Saved this one for the grid.
 - Soft flaws, sharp timing.
 - Looks unplanned. Was not.

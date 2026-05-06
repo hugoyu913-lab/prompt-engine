@@ -22,6 +22,7 @@ DATA_DIR = PROJECT_ROOT / "data"
 LATEST_OUTPUT = OUTPUTS_DIR / "latest_prompt.md"
 PROMPT_RUNS_FILE = DATA_DIR / "prompt_runs.jsonl"
 IMAGE_REVIEWS_FILE = DATA_DIR / "image_reviews.jsonl"
+LEARNED_PATTERNS_FILE = DATA_DIR / "learned_patterns.json"
 LIST_COMMANDS = {"list", "ls", "help", "?"}
 
 PLATFORM_PROFILES = {
@@ -101,6 +102,22 @@ def read_jsonl(path: Path) -> list[dict]:
             except json.JSONDecodeError:
                 continue
     return records
+
+
+def save_json(path: Path, data: dict) -> None:
+    """Save a dictionary as pretty JSON."""
+    path.parent.mkdir(exist_ok=True)
+    path.write_text(json.dumps(data, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+
+
+def load_learned_patterns() -> dict:
+    """Load learned prompt patterns if analysis has been run."""
+    if not LEARNED_PATTERNS_FILE.exists():
+        return {}
+    try:
+        return json.loads(LEARNED_PATTERNS_FILE.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
 
 
 def load_negative_prompt() -> str:
@@ -259,6 +276,37 @@ def build_identity_lock(subject: str) -> dict:
     }
 
 
+def build_prompt_dna(
+    aesthetic_key: str,
+    camera_key: str,
+    platform_key: str,
+    lighting_key: str,
+    mood: str,
+    aesthetics: dict,
+    cameras: dict,
+    lighting: dict,
+) -> dict:
+    """Describe the prompt's reusable creative pattern."""
+    aesthetic = aesthetics[aesthetic_key]
+    camera = cameras[camera_key]
+    return {
+        "realism_style": ", ".join(aesthetic["realism_notes"]),
+        "camera_language": f"{camera['label']}: {camera['look']}",
+        "composition_language": PLATFORM_PROFILES[platform_key]["format"],
+        "aesthetic_intensity": f"Medium-strong {aesthetic_key.replace('_', ' ')} with grounded detail.",
+        "lighting_behavior": lighting[lighting_key],
+        "emotional_tone": mood,
+    }
+
+
+def build_mutation_notes(reason: str, changes: list[str]) -> dict:
+    """Describe how and why a prompt changed."""
+    return {
+        "what_changed": changes,
+        "why_it_changed": reason,
+    }
+
+
 def build_variations(
     subject: str,
     aesthetic_key: str,
@@ -350,6 +398,8 @@ def render_markdown(
     model_specific_prompt: str,
     negative_prompt: str,
     identity_lock: dict,
+    prompt_dna: dict,
+    mutation_notes: dict,
     variations: list[str],
     captions: list[str],
     scorecard: dict,
@@ -357,6 +407,8 @@ def render_markdown(
     """Render the full result as Markdown."""
     variation_lines = "\n".join(f"{index}. {text}" for index, text in enumerate(variations, 1))
     caption_lines = "\n".join(f"- {caption}" for caption in captions)
+    dna_lines = "\n".join(f"- {key.replace('_', ' ').title()}: {value}" for key, value in prompt_dna.items())
+    changed_lines = render_list("What changed", mutation_notes["what_changed"])
     problem_lines = render_list("Problems noticed", scorecard["problems_noticed"])
     improvement_lines = render_list("Prompt improvement notes", scorecard["prompt_improvement_notes"])
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -404,6 +456,20 @@ Generated: {created_at}
 ### Consistency reminders
 
 {render_list("Consistency reminders", identity_lock["consistency_reminders"])}
+
+## Prompt DNA
+
+{dna_lines}
+
+## Mutation Notes
+
+### What changed from the original prompt
+
+{changed_lines}
+
+### Why it changed
+
+{mutation_notes["why_it_changed"]}
 
 ## 3 Variations
 
@@ -537,6 +603,227 @@ def show_best(limit: int = 5) -> None:
             print(f"  improve: {review['what_to_improve']}")
 
 
+def average_by_field(reviewed_runs: list[dict], field: str) -> list[dict]:
+    """Average review scores by a run field."""
+    buckets = {}
+    for item in reviewed_runs:
+        key = item["run"].get(field, "unknown")
+        buckets.setdefault(key, []).append(item["review"]["average_score"])
+
+    results = []
+    for key, scores in buckets.items():
+        results.append({"name": key, "average_score": round(sum(scores) / len(scores), 2), "count": len(scores)})
+    return sorted(results, key=lambda item: (item["average_score"], item["count"]), reverse=True)
+
+
+def detect_common_traits(high_scoring_runs: list[dict]) -> list[str]:
+    """Find simple repeated prompt traits in strong runs."""
+    trait_checks = {
+        "natural pores and skin texture": ["natural pores", "skin texture"],
+        "direct flash or hard practical light": ["direct flash", "on-camera flash", "hard"],
+        "cinematic low-light realism": ["low-light", "cinematic", "night"],
+        "imperfect candid framing": ["imperfect crop", "candid", "snapshot"],
+        "visible wardrobe and fabric texture": ["fabric texture", "wardrobe", "clothing folds"],
+        "clear platform crop language": ["crop", "composition", "framing"],
+        "identity consistency reminders": ["identity", "same core subject", "preserve"],
+    }
+    text = " ".join(item["run"].get("universal_prompt", "").lower() for item in high_scoring_runs)
+    found = []
+    for trait, needles in trait_checks.items():
+        if any(needle in text for needle in needles):
+            found.append(trait)
+    return found or ["No repeated traits detected yet. Add more reviewed runs."]
+
+
+def analyze_reviewed_runs() -> dict:
+    """Analyze reviewed runs and save learned pattern data."""
+    runs = {run["run_id"]: run for run in read_jsonl(PROMPT_RUNS_FILE)}
+    reviews = read_jsonl(IMAGE_REVIEWS_FILE)
+    reviewed_runs = [{"run": runs[review["run_id"]], "review": review} for review in reviews if review["run_id"] in runs]
+
+    if not reviewed_runs:
+        findings = {
+            "created_at": datetime.now().isoformat(timespec="seconds"),
+            "reviewed_run_count": 0,
+            "message": "No reviewed prompt runs yet. Generate prompts, review images, then run --analyze.",
+        }
+        save_json(LEARNED_PATTERNS_FILE, findings)
+        print(findings["message"])
+        return findings
+
+    high_scoring = [item for item in reviewed_runs if item["review"]["average_score"] >= 8]
+    if not high_scoring:
+        high_scoring = sorted(reviewed_runs, key=lambda item: item["review"]["average_score"], reverse=True)[:3]
+
+    findings = {
+        "created_at": datetime.now().isoformat(timespec="seconds"),
+        "reviewed_run_count": len(reviewed_runs),
+        "high_scoring_run_count": len(high_scoring),
+        "highest_scoring_aesthetics": average_by_field(reviewed_runs, "aesthetic"),
+        "best_cameras": average_by_field(reviewed_runs, "camera"),
+        "best_lighting_setups": average_by_field(reviewed_runs, "lighting"),
+        "best_platforms": average_by_field(reviewed_runs, "platform"),
+        "common_traits_high_scoring": detect_common_traits(high_scoring),
+        "top_run_ids": [item["run"]["run_id"] for item in sorted(high_scoring, key=lambda item: item["review"]["average_score"], reverse=True)[:5]],
+    }
+    save_json(LEARNED_PATTERNS_FILE, findings)
+
+    print(f"Saved learned patterns to {LEARNED_PATTERNS_FILE}")
+    print("Top aesthetics: " + ", ".join(item["name"] for item in findings["highest_scoring_aesthetics"][:3]))
+    print("Top cameras: " + ", ".join(item["name"] for item in findings["best_cameras"][:3]))
+    print("Top lighting: " + ", ".join(item["name"] for item in findings["best_lighting_setups"][:3]))
+    return findings
+
+
+def best_key_from_patterns(patterns: dict, section: str, fallback: str) -> str:
+    """Pick a learned best key if available."""
+    items = patterns.get(section, [])
+    if items:
+        return items[0]["name"]
+    return fallback
+
+
+def build_evolved_selection(patterns: dict, aesthetics: dict, cameras: dict, lighting: dict, poses: dict) -> dict:
+    """Choose presets biased toward learned high-scoring patterns."""
+    aesthetic_key = best_key_from_patterns(patterns, "highest_scoring_aesthetics", choose_random_key(aesthetics))
+    camera_key = best_key_from_patterns(patterns, "best_cameras", choose_random_key(cameras))
+    lighting_key = best_key_from_patterns(patterns, "best_lighting_setups", choose_random_key(lighting))
+    if aesthetic_key not in aesthetics:
+        aesthetic_key = choose_random_key(aesthetics)
+    if camera_key not in cameras:
+        camera_key = choose_random_key(cameras)
+    if lighting_key not in lighting:
+        lighting_key = choose_random_key(lighting)
+    return {
+        "aesthetic": aesthetic_key,
+        "camera": camera_key,
+        "lighting": lighting_key,
+        "pose": choose_random_key(poses),
+    }
+
+
+def mutate_text(base_prompt: str, variant_number: int) -> tuple[str, list[str]]:
+    """Create one evolved prompt mutation."""
+    changes_by_variant = [
+        (
+            "Increase camera specificity and preserve practical imperfections.",
+            "Add lens behavior, imperfect focus, visible pores, and grounded color.",
+        ),
+        (
+            "Tighten composition language for stronger social-media readability.",
+            "Add crop, negative space, subject hierarchy, and thumbnail clarity.",
+        ),
+        (
+            "Raise aesthetic intensity while keeping photography believable.",
+            "Add stronger wardrobe, environment, and lighting cues without fantasy styling.",
+        ),
+        (
+            "Add environmental detail so the scene feels lived-in.",
+            "Add background texture, clutter, reflections, weather, or room-specific objects.",
+        ),
+        (
+            "Make realism wording more defensive against AI-looking output.",
+            "Add asymmetry, fabric flaws, natural hands, imperfect skin, and real lens distortion.",
+        ),
+    ]
+    change, addition = changes_by_variant[variant_number % len(changes_by_variant)]
+    return f"{base_prompt} Evolved direction: {addition}", [change]
+
+
+def mutate_prompt_run() -> None:
+    """Create evolved variants from an existing run."""
+    runs = {run["run_id"]: run for run in read_jsonl(PROMPT_RUNS_FILE)}
+    if not runs:
+        print("No prompt runs found. Generate a prompt first.")
+        return
+
+    run_id = ask("Run ID to mutate")
+    if run_id not in runs:
+        print(f"Unknown run_id: {run_id}")
+        print("Use --history to see recent run IDs.")
+        return
+
+    original = runs[run_id]
+    variant_count = 5
+    evolved_variants = []
+    all_changes = []
+    for index in range(variant_count):
+        prompt, changes = mutate_text(original["universal_prompt"], index)
+        evolved_variants.append(prompt)
+        all_changes.extend(changes)
+
+    mutation_run_id = uuid.uuid4().hex[:12]
+    identity_lock = build_identity_lock(original["subject"])
+    prompt_dna = {
+        "realism_style": "Preserve original identity while increasing realism safeguards.",
+        "camera_language": "Mutated camera wording across variants.",
+        "composition_language": "Mutated crop and social readability wording.",
+        "aesthetic_intensity": "Slightly varied across variants.",
+        "lighting_behavior": "Preserve original lighting behavior and add practical detail.",
+        "emotional_tone": original["mood"],
+    }
+    mutation_notes = build_mutation_notes(
+        f"Mutated from run {run_id} to test which wording improves postability without changing identity.",
+        all_changes,
+    )
+    variant_lines = "\n\n".join(f"### Variant {index}\n\n{prompt}" for index, prompt in enumerate(evolved_variants, 1))
+    markdown = f"""# Prompt Mutation Output
+
+Run ID: {mutation_run_id}
+Parent Run ID: {run_id}
+
+## Identity Lock
+
+### Immutable face/body traits
+
+{render_list("Immutable traits", identity_lock["immutable_traits"])}
+
+### What must not change
+
+{render_list("Must not change", identity_lock["must_not_change"])}
+
+### Consistency reminders
+
+{render_list("Consistency reminders", identity_lock["consistency_reminders"])}
+
+## Prompt DNA
+
+{render_list("Prompt DNA", [f"{key.replace('_', ' ').title()}: {value}" for key, value in prompt_dna.items()])}
+
+## Mutation Notes
+
+### What changed from the original prompt
+
+{render_list("What changed", mutation_notes["what_changed"])}
+
+### Why it changed
+
+{mutation_notes["why_it_changed"]}
+
+## Evolved Variants
+
+{variant_lines}
+"""
+    OUTPUTS_DIR.mkdir(exist_ok=True)
+    LATEST_OUTPUT.write_text(markdown, encoding="utf-8")
+    append_jsonl(
+        PROMPT_RUNS_FILE,
+        {
+            **original,
+            "run_id": mutation_run_id,
+            "created_at": datetime.now().isoformat(timespec="seconds"),
+            "parent_run_id": run_id,
+            "mode": "mutate",
+            "universal_prompt": evolved_variants[0],
+            "model_specific_prompt": evolved_variants[0],
+            "mutation_variants": evolved_variants,
+            "latest_output": str(LATEST_OUTPUT),
+        },
+    )
+    print(markdown)
+    print(f"Saved mutation output to {LATEST_OUTPUT}")
+
+
 def build_prompt_run_record(
     run_id: str,
     subject: str,
@@ -550,6 +837,8 @@ def build_prompt_run_record(
     pose_key: str,
     universal_prompt: str,
     model_specific_prompt: str,
+    prompt_dna: dict,
+    mutation_notes: dict,
 ) -> dict:
     """Build the saved generation record."""
     return {
@@ -566,6 +855,8 @@ def build_prompt_run_record(
         "pose": pose_key,
         "universal_prompt": universal_prompt,
         "model_specific_prompt": model_specific_prompt,
+        "prompt_dna": prompt_dna,
+        "mutation_notes": mutation_notes,
         "latest_output": str(LATEST_OUTPUT),
     }
 
@@ -578,6 +869,7 @@ def main() -> None:
     poses = load_json("poses.json")
     negative_prompt = load_negative_prompt()
     random_mode = has_command("--random", "random")
+    evolve_mode = has_command("--evolve", "evolve")
 
     maybe_print_list_and_exit(aesthetics, cameras)
     if has_command("--history", "history"):
@@ -589,14 +881,35 @@ def main() -> None:
     if has_command("--best", "best"):
         show_best()
         return
+    if has_command("--analyze", "analyze"):
+        analyze_reviewed_runs()
+        return
+    if has_command("--mutate", "mutate"):
+        mutate_prompt_run()
+        return
 
     print("Prompt Engine")
     print("Generate hyper-realistic social media image prompts.\n")
     print("Tip: run `python src/generate_prompt.py --list` to view options.")
     print("Tip: run `python src/generate_prompt.py --random` to randomize aesthetic, camera, lighting, and pose.\n")
+    print("Tip: run `python src/generate_prompt.py --evolve` to bias prompts toward learned winners.\n")
 
     subject = ask("Subject", "a stylish person with realistic skin texture")
-    if random_mode:
+    if evolve_mode:
+        learned_patterns = load_learned_patterns()
+        selections = build_evolved_selection(learned_patterns, aesthetics, cameras, lighting, poses)
+        aesthetic_key = selections["aesthetic"]
+        camera_key = selections["camera"]
+        lighting_key = selections["lighting"]
+        pose_key = selections["pose"]
+        print("\nEvolved selections")
+        print(f"  Aesthetic: {aesthetic_key}")
+        print(f"  Camera: {camera_key}")
+        print(f"  Lighting: {lighting_key}")
+        print(f"  Pose: {pose_key}")
+        if not learned_patterns:
+            print("  No learned patterns found yet; using random fallback.")
+    elif random_mode:
         aesthetic_key = choose_random_key(aesthetics)
         camera_key = choose_random_key(cameras)
         lighting_key = choose_random_key(lighting)
@@ -648,6 +961,30 @@ def main() -> None:
     captions = build_captions(subject, mood, aesthetic_key, platform_key)
     scorecard = build_scorecard()
     run_id = uuid.uuid4().hex[:12]
+    prompt_dna = build_prompt_dna(
+        aesthetic_key,
+        camera_key,
+        platform_key,
+        lighting_key,
+        mood,
+        aesthetics,
+        cameras,
+        lighting,
+    )
+    if evolve_mode:
+        mutation_notes = build_mutation_notes(
+            "This prompt uses learned pattern bias from reviewed high-scoring runs.",
+            [
+                "Selected historically stronger aesthetic, camera, or lighting when available.",
+                "Kept identity and platform requirements unchanged.",
+                "Used learned direction while preserving beginner-friendly prompt structure.",
+            ],
+        )
+    else:
+        mutation_notes = build_mutation_notes(
+            "Fresh generation; no parent prompt was mutated.",
+            ["Created baseline prompt DNA for future testing and evolution."],
+        )
 
     markdown = render_markdown(
         run_id,
@@ -664,6 +1001,8 @@ def main() -> None:
         model_specific_prompt,
         negative_prompt,
         identity_lock,
+        prompt_dna,
+        mutation_notes,
         variations,
         captions,
         scorecard,
@@ -686,6 +1025,8 @@ def main() -> None:
             pose_key,
             universal_prompt,
             model_specific_prompt,
+            prompt_dna,
+            mutation_notes,
         ),
     )
 
